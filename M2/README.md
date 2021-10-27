@@ -1,8 +1,5 @@
-# Distribuidos-2021-2
+# Máquina 1
 
-Repo de tareas de distribuidos
+## Máquina que será el **NameNode**
 
-Nombres: <br>
-Luis Gonzalez <br>
-Sebastian Martinez <br>
-Iñaki Oyarzun <br>
+Comandos para correr:
