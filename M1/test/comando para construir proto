@@ -1,0 +1,5 @@
+comando para construir proto
+
+correr a la altura de test/
+
+protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/wishlist.proto
