@@ -4,6 +4,11 @@ import (
 	"context"
 	"log"
 	"net"
+	//"net/http"
+
+	"google.golang.org/grpc"
+	pb "google.golang.org/grpc/examples/helloworld/helloworld"
+	//pb "https://github.com/MaxGGx/Distribuidos-2021-2/blob/main/M1/helloworld.pb.go"
 )
 
 const (
@@ -12,7 +17,7 @@ const (
 
 // server is used to implement helloworld.GreeterServer.
 type server struct {
-	pb.UnimplementedGreeterServer
+	//pb.UnimplementedGreeterServer
 }
 
 // SayHello implements helloworld.GreeterServer
