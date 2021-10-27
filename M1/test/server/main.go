@@ -1,15 +1,18 @@
 package main
 
 import (
-	"time"
+	"context"
+	"fmt"
 	pb "github.com/MaxGGx/Distribuidos-2021-2/tree/main/M1/test/proto"
+	"google.golang.org/grpc"
+	"net"
 )
 
 type server struct {
 	pb.UnimplementedWishListServiceServer
 }
 
-func (s *server) create (ctx context.Context, *pb.CreateWishListReq) (*pb.CreateWishListResp, error) {
+func (s *server) Create (ctx context.Context, req *pb.CreateWishListReq) (*pb.CreateWishListResp, error) {
 	fmt.Println("creating the wish list " + req.WishList.Name )
 	return &pb.CreateWishListResp{
 		WishListId: req.WishList.Id,
