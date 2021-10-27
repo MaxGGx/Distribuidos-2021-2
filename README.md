@@ -2,7 +2,7 @@
 
 Repo de tareas de distribuidos
 
-Nombres:
-Luis Gonzalez
-Sebastian Martinez
-Iñaki Oyarzun
+Nombres: <br>
+Luis Gonzalez <br>
+Sebastian Martinez <br>
+Iñaki Oyarzun <br>
