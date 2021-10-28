@@ -7,10 +7,9 @@ import (
 )
 
 type Server struct {
-
 }
 
-func (s *Server) SauHello(ctx context.Context, message *Message) (*Message, error) {
-	log.Printf("Mensaje recibido desde el body de cliente: %s", message.Body)
-	return &Message{Body:"Hola desde el servidor!"}, nil
+func (s *Server) SayHello(ctx context.Context, message *Message) (*Message, error) {
+	log.Printf("Received message body from client: %s", message.Body)
+	return &Message{Body: "Hello From the Server!"}, nil
 }
