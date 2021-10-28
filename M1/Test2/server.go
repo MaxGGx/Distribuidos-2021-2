@@ -4,8 +4,9 @@ import (
 	"log"
 	"net"
 
-	"google.golang.org/grpc"
 	"github.com/MaxGGx/Distribuidos-2021-2/tree/main/M1/Test2/chat"
+	"google.golang.org/grpc"
+	
 )
 
 //Comando para inicializar el go.mod y go.sum, se le indica al comando donde estará alojado en el repo la carpeta con los archivos (o algo asi)
