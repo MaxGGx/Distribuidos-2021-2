@@ -3,7 +3,7 @@ syntax = "proto3";
 package chat;
 
 /*Esto especifica donde está el paquete que estamos creando, como no tiene dirección, a la hora de compilar, solo soltara el archivo compilado*/
-option go_package = "./";
+option go_package = "/chat";
 
 /* Defino una interfaz base para poder solamente intercambiar los mensajes entre el servidor y el usuario, es decir, quien hace de user, se conectara y solamente podra echar a andar
 la funcion SayHello, que solo manejara un mensaje de recepción y retornará otro de vuelta (Cuando se implemente en el server, se puede tomar ese dato que recibe y trabajarlo para luego
