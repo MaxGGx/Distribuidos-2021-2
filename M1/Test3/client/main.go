@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	pb "github.com/MaxGGx/Distribuidos-2021-2/tree/main/M1/Test3/proto"
+	pb "github.com/MaxGGx/Distribuidos-2021-2/M1/Test3/proto"
 	"google.golang.org/grpc"
 )
 
