@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	pb "github.com/MaxGGx/Distribuidos-2021-2/tree/main/M1/Test3/proto"
+	//pb "github.com/MaxGGx/Distribuidos-2021-2/M1/Test3/proto"
 	"google.golang.org/grpc"
 	"net"
 )
@@ -26,7 +26,7 @@ func main() {
 
 	serv := grpc.NewServer()
 	pb.RegisterEntradaMensajeServer(serv, &server{})
-	if err = serv.Serve(listener); err != nil, {
+	if err = serv.Serve(listener); err != nil {
 		panic("No se ha podido inicializar el servidor: "+ err.Error())
 	}
 }
