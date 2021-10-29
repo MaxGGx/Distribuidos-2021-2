@@ -4,8 +4,9 @@ import (
 	"log"
 	"net"
 
-	pb "github.com/MaxGGx/Distribuidos-2021-2/tree/main/M1/Test2/chat"
+	chat "github.com/MaxGGx/Distribuidos-2021-2/tree/main/M1/Test2/chat"
 	"google.golang.org/grpc"
+	"net"
 )
 
 func main() {
