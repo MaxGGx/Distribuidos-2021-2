@@ -13,8 +13,8 @@ type server struct {
 }
 
 func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaje, error) {
-	fmt.Println("Se recibió el siguiente mensaje: "+ req.body)
-	return &pb.Mensaje{body: "Mensaje recibido desde servidor"}, nil 
+	fmt.Println("Se recibió el siguiente mensaje: "+ req.Body)
+	return &pb.Mensaje{Body: "Mensaje recibido desde servidor"}, nil 
 }
 
 func main() {
