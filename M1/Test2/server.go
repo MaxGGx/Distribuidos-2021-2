@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 
-	chat "github.com/MaxGGx/Distribuidos-2021-2/tree/main/M1/Test2/chat"
+	chat "github.com/MaxGGx/Distribuidos-2021-2/tree/main/M1/Test2"
 	"google.golang.org/grpc"
 	"net"
 )
