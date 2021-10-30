@@ -5,6 +5,8 @@ import (
 	"github.com/streadway/amqp"
 )
 
+//Este es el codigo para el cliente de la aplicacion, se conecta a la cola de rabbit para postear un mensaje o solicitud, luego el servidor hara pull a los mensajes para procesarlos
+
 func main() {
 	fmt.Println("Test RabbitMQ")
 
