@@ -1,5 +1,5 @@
-# Máquina 1
+# Máquina 2
 
-## Máquina que será el **NameNode**
+## Máquina que será el **Pozo**
 
 Comandos para correr:
