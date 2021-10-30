@@ -48,7 +48,7 @@ func main() {
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body: []byte("Hola Mundo"),
-		}
+		},
 	)
 
 	if err != nil {
