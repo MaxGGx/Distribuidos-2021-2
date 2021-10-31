@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:50052", grpc.WithInsecure())
 
 	if err != nil {
 		panic("No se puede conectar al servidor "+ err.Error())
@@ -17,7 +17,7 @@ func main() {
 	serviceClient := pb.NewEntradaMensajeClient(conn)
 
 	res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
-		Body: "Enviando prueba...",
+		Body: "ARCHIVO,Jugador_9,Ronda_3",
 	})
 
 	if err != nil {

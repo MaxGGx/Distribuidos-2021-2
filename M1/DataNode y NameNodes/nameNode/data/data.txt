@@ -1,0 +1,7 @@
+
+Jugador_1 Ronda_1 localhost:50054
+Jugador_2 Ronda_3 localhost:50054
+Jugador_3 Ronda_3 localhost:50053
+Jugador_4 Ronda_3 localhost:50053
+Jugador_5 Ronda_3 localhost:50054
+Jugador_9 Ronda_3 localhost:50055
