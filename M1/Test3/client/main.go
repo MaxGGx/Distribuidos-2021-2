@@ -18,7 +18,7 @@ func msg(direccion string){
 	serviceClient := pb.NewEntradaMensajeClient(conn)
 
 	res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
-		Body: "Enviando prueba...",
+		Body: "POZO",
 	})
 
 	if err != nil {
@@ -32,7 +32,7 @@ func main() {
 	//var srvrs = []string{"50051","50052","50053","50054","50055","50056","50057","50058","50059","50060","50061","50062","50063","50064","50065","50066"}
 	msg("50051")
 	msg("50052")
-	msg("50053")
+	msg("50060")
 	//for i := 0; i < 15; i++ {
 	//	msg(srvrs[i])
 	//}

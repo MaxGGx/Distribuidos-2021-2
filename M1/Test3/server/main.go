@@ -25,12 +25,13 @@ func crearServer(server *grpc.Server, direccion string){
 	if err = server.Serve(listener); err != nil {
 		panic("No se ha podido inicializar el servidor: "+ err.Error())
 	}
+	
 }
 
 func main() {
 	s := &server{}
 	serv1 := grpc.NewServer()
-	serv2 := grpc.NewServer()
+	//serv2 := grpc.NewServer()
 	//serv3 := grpc.NewServer()
 	//serv4 := grpc.NewServer()
 	//serv5 := grpc.NewServer()
@@ -47,7 +48,7 @@ func main() {
 	//serv16 := grpc.NewServer()
 
 	pb.RegisterEntradaMensajeServer(serv1, s)
-	pb.RegisterEntradaMensajeServer(serv2, s)
+	//pb.RegisterEntradaMensajeServer(serv2, s)
 	//pb.RegisterEntradaMensajeServer(serv3, s)
 	//pb.RegisterEntradaMensajeServer(serv4, s)
 	//pb.RegisterEntradaMensajeServer(serv5, s)
@@ -64,7 +65,7 @@ func main() {
 	//pb.RegisterEntradaMensajeServer(serv16, s)
 
 	go crearServer(serv1,":50051")
-	crearServer(serv2,":50052")
+	//go crearServer(serv2,":50052")
 	//crearServer(serv3,":50053")
 	//go crearServer(serv4,":50054")
 	//go crearServer(serv5,":50055")
