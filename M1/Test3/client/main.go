@@ -7,8 +7,9 @@ import (
 	"google.golang.org/grpc"
 )
 
-func main() {
-	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+func msg(direccion string){
+	fmt.Printf("%s\n",direccion)
+	conn, err := grpc.Dial("localhost:"+direccion, grpc.WithInsecure())
 
 	if err != nil {
 		panic("No se puede conectar al servidor "+ err.Error())
@@ -25,4 +26,12 @@ func main() {
 	}
 
 	fmt.Println(res.Body)
+}
+
+func main() {
+	var srvrs = []string{"50051","50052","50053","50054","50055","50056","50057","50058","50059","50060","50061","50062","50063","50064","50065","50066"}
+	
+	for i := 0; i < 15; i++ {
+		msg(srvrs[i])
+	}
 }

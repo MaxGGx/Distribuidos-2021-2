@@ -1,4 +1,4 @@
-module github.com/MaxGGx/Distribuidos-2021-2/M1/TestRabbitMQ
+module github.com/MaxGGx/Distribuidos-2021-2/M2/TestRabbitMQ
 
 go 1.17
 

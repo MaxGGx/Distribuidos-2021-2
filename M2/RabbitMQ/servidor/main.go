@@ -24,7 +24,7 @@ func main() {
 	defer ch.Close()
 
 	msgs, err :=  ch.Consume(
-		"TestQueue",
+		"Pozo",
 		"",
 		true,
 		false,
