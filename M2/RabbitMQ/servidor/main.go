@@ -3,11 +3,14 @@ package main
 import(
 	"fmt"
 	"github.com/streadway/amqp"
+	"strings"
 )
+/*
+FORMATO PARA JUGADOR ELIMINADO: ("MUERTE",JUGADOR,RONDA)
+*/
 
 func main() {
-	pozo = 0
-
+	pozo := 11
 	fmt.Println("Aplicacion consumidor (Server)")
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	if err != nil {
@@ -24,7 +27,7 @@ func main() {
 	defer ch.Close()
 
 	msgs, err :=  ch.Consume(
-		"Pozo",
+		"TestQueue",
 		"",
 		true,
 		false,
@@ -37,18 +40,18 @@ func main() {
 	go func() {
 		for d := range msgs{
 			fmt.Printf("Mensaje recibido: %s\n", d.Body)
-			//placeholder lógica
-			if d.Body == 1{
-				fmt.Printf("Pozo es: %s\n",pozo)
-			}
-			else if d.Body == 2{
+			response := strings.Split(string(d.Body),",")
+			if response[0] == "MUERTE"{
 				pozo += 100000000
 			}
+			fmt.Println(pozo)
+			//implementar muerte jugador en el .txt
 		}
+
 	}()
 
 	fmt.Println("Conectado a la instancia de RabbitMQ")
 	fmt.Println("[*] - Esperando mensajes")
-
+	
 	<-forever
 }
