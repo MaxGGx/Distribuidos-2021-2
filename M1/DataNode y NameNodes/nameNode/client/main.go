@@ -17,7 +17,7 @@ func main() {
 	serviceClient := pb.NewEntradaMensajeClient(conn)
 
 	res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
-		Body: "Palabra 2",
+		Body: "Enviando prueba...",
 	})
 
 	if err != nil {
