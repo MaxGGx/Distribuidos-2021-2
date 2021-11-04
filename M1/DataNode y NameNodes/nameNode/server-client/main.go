@@ -103,7 +103,9 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 					res1 = res.Body
 				}
 			}
-		}
+		} if res1 == ""{
+			res1 = "No se tiene data del jugador en la "+request[2]
+		} 
 	} else {
 		file, err := os.Open("data/data.txt")
 		if err != nil{

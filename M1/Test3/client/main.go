@@ -22,7 +22,7 @@ func main() {
 	for i:=1 ; i<17;i++{
 		valor := strconv.Itoa(i)
 		res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
-		Body: valor+" Listo?",
+		Body: valor+" 2",
 	})
 	if err != nil {
 		panic("Mensaje no pudo ser creado ni enviado: "+ err.Error())

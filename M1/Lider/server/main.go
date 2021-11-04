@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"math/rand"
 	"strings"
+	"math"
+	"github.com/streadway/amqp"
 
 )
 
@@ -20,6 +22,7 @@ type server struct {
 var flagListo = 0
 var solicitudes [17]string
 var respuestas [17]string
+var status = [17]int {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 
 //Es como un len de python, cuenta strings no vacios de un array de tamaño 17.
 func tamanio(lista [17]string) (cont int) {
@@ -32,7 +35,7 @@ func tamanio(lista [17]string) (cont int) {
 	return
 }
 
-//Es como un len de python, cuenta strings no vacios de un array de tamaño 17.
+//Es como un len de python, cuenta los valores 1 de un array.
 func tamanio2(lista [17]int) (cont int) {
 	cont = 0
 	for _,s := range lista{
@@ -66,7 +69,7 @@ func Recepcion(mensaje string) (resmje string){
 	solicitudes[valor] = temp[1]
 	fmt.Println("Mensajes de jugadores recibidos:")
 	fmt.Println(solicitudes)
-	if tamanio(solicitudes) == 16{
+	if tamanio(solicitudes) == tamanio2(status){
 		flagListo = 0
 	}
 	resmje = "[*] Respuesta Recibida"
@@ -95,6 +98,15 @@ func PendingRequest(mensaje string) (val int){
 }
 
 func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaje, error) {
+	
+	//AGREGAR IP DE CONEXION A SERVER GRPC POZO
+	
+	conn1, err1 := grpc.Dial("localhost:50056", grpc.WithInsecure())
+	if err1 != nil {
+		panic("No se puede conectar al Data Node 1 "+ err1.Error())
+	}
+	serviceClient1 := pb.NewEntradaMensajeClient(conn1)
+	
 	var res string
 	fmt.Println("Se recibió el siguiente mensaje: "+ req.Body)
 	//Mientras espera mensaje jugador debe escribir "<N jugador> Listo?"
@@ -107,7 +119,18 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 		
 	//Para pedir monto de pozo jugador debe hacer "<N jugador> POZO"
 	}else if strings.Contains(req.Body, "POZO"){
-	 	//ARMAR CONEXION A BASE DE DATOS DE LUCHO PARA OBTENER MONTO
+		solicitud := "POZO"
+	 	res1, err := serviceClient1.Intercambio(context.Background(), &pb.Mensaje{
+			Body: solicitud,
+		})
+
+		if err != nil {
+			panic("Mensaje no pudo ser creado ni enviado: "+ err.Error())
+		}
+		res := res1.Body
+		if res == ""{
+			res = "SIN DATOS"
+		}
 	} else {
 		res = Recepcion(req.Body)
 		
@@ -130,17 +153,48 @@ func initServer(){
 }
 
 func main() {
-	status := [17]int{0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+	
 	go initServer()
+	
+	//CONEXION A SERVIDOR RABBIT MQ AGREGAR IP AQUI
+	
+	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
+	defer conn.Close()
+
+	ch, err := conn.Channel()
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
+	defer ch.Close()
+
+	q, err := ch.QueueDeclare(
+		"TestQueue",
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil{
+		fmt.Println(err)
+		panic(err)
+	}
+	fmt.Println(q)
+
+
 
 	//CONEXION A NAME NODE IP: M3:
-	conn, err := grpc.Dial("localhost:50052", grpc.WithInsecure())
+	conn3, err := grpc.Dial("localhost:50052", grpc.WithInsecure())
 	if err != nil {
-		print("PANIK")
 		panic("No se puede conectar al servidor "+ err.Error())
 	}
 
-	serviceClient := pb.NewEntradaMensajeClient(conn)
+	serviceClient := pb.NewEntradaMensajeClient(conn3)
 
 	//RECEPCION DE SOLICITUDES POR PARTE DE LOS USUARIOS
 	fmt.Println("[*] Esperando solicitudes...")
@@ -154,7 +208,6 @@ func main() {
 		fmt.Println("Seleccione una opción para continuar escribiendo un número:\n")
 		fmt.Println("0) Dar inicio al juego 1 de Squid Game <コ:彡")
 		fmt.Println("Aún no hay info sobre las jugadas, debe comenzar el juego primero")
-		//fmt.Println("Ingrese un numero del 1 al 16 para consultar el historial de un jugador")
 		fmt.Scanln(&PromptLider)
 	}
 	for i:=1 ; i<17 ; i++{
@@ -188,7 +241,7 @@ func main() {
 		if err != nil {
 			panic("Error con la solicitud para ir registrando el historial de un jugador: "+err.Error())	
 		}else{
-			fmt.Println(res)
+			fmt.Println(res.Body)
 		}
 
 		//Procesado de respuesta
@@ -196,10 +249,25 @@ func main() {
 		if resR1 == ronda1valor{
 			fmt.Println("Jugador "+stringjugador+" Ha MUERTO")
 			status[i] = 0
-			respuestas[i] = "MUERTO"
+			respuestas[i] = "MUERTO 1"
+			err = ch.Publish(
+				"",
+				"TestQueue",
+				false,
+				false,
+				amqp.Publishing{
+					ContentType: "text/plain",
+					Body: []byte("MUERTE,"+stringjugador+",1"),
+				},
+			)
+
+			if err != nil {
+				fmt.Println(err)
+				panic(err)
+			}
 		} else {
 			juego1sumas[i] = resR1
-			respuestas[i] = "OK"
+			respuestas[i] = "VIVO 1"
 		}
 	}
 	VaciarSolicitudes()
@@ -218,27 +286,44 @@ func main() {
 	VaciarRespuestas()
 
 	for i:=1; i<17; i++{
-		//Previo a procesar la respuesta se registra en el log de NameNode:
-		stringjugador = strconv.Itoa(i)
-		
-		res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
-		Body: "JUGA,"+stringjugador+",1,"+solicitudes[i],
-		})
-		if err != nil {
-			panic("Error con la solicitud para ir registrando el historial de un jugador: "+err.Error())	
-		}else{
-			fmt.Println(res)
-		}
+		if status[i] == 1{
+			//Previo a procesar la respuesta se registra en el log de NameNode:
+			stringjugador = strconv.Itoa(i)
+			
+			res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
+			Body: "JUGA,"+stringjugador+",1,"+solicitudes[i],
+			})
+			if err != nil {
+				panic("Error con la solicitud para ir registrando el historial de un jugador: "+err.Error())	
+			}else{
+				fmt.Println(res.Body)
+			}
 
-		//Procesado de respuesta
-		resR2,_ := strconv.Atoi(solicitudes[i])
-		if resR2 == ronda2valor{
-			fmt.Println("Jugador "+stringjugador+" Ha MUERTO")
-			status[i] = 0
-			respuestas[i] = "MUERTO"
-		} else {
-			juego1sumas[i] += resR2
-			respuestas[i] = "OK"
+			//Procesado de respuesta
+			resR2,_ := strconv.Atoi(solicitudes[i])
+			if resR2 == ronda2valor{
+				fmt.Println("Jugador "+stringjugador+" Ha MUERTO")
+				status[i] = 0
+				respuestas[i] = "MUERTO 1"
+				err = ch.Publish(
+				"",
+				"TestQueue",
+				false,
+				false,
+				amqp.Publishing{
+					ContentType: "text/plain",
+					Body: []byte("MUERTE,"+stringjugador+",1"),
+				},
+				)
+
+				if err != nil {
+					fmt.Println(err)
+					panic(err)
+				}
+			} else {
+				juego1sumas[i] += resR2
+				respuestas[i] = "VIVO 1"
+			}
 		}
 	}
 	VaciarSolicitudes()
@@ -249,42 +334,551 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 	ronda3valor := (rand.Intn(4)+6)
 
-	fmt.Println("[*] Esperando respuestas Ronda 2 Juego 1...")
-	for tamanio(solicitudes) < 16{
+	fmt.Println("[*] Esperando respuestas Ronda 3 Juego 1...")
+	for tamanio(solicitudes) < tamanio2(status){
 		
 	}
 	flagListo = 0
 	VaciarRespuestas()
 
 	for i:=1; i<17; i++{
-		//Previo a procesar la respuesta se registra en el log de NameNode:
-		stringjugador := strconv.Itoa(i)
-		
-		res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
-		Body: "JUGA,"+stringjugador+",1,"+solicitudes[i],
-		})
-		if err != nil {
-			panic("Error con la solicitud para ir registrando el historial de un jugador: "+ err.Error())	
-		}else{
-			fmt.Println(res)
-		}
+		if status[i] == 1{
+			//Previo a procesar la respuesta se registra en el log de NameNode:
+			stringjugador := strconv.Itoa(i)
+			
+			res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
+			Body: "JUGA,"+stringjugador+",1,"+solicitudes[i],
+			})
+			if err != nil {
+				panic("Error con la solicitud para ir registrando el historial de un jugador: "+ err.Error())	
+			}else{
+				fmt.Println(res.Body)
+			}
 
-		//Procesado de respuesta
-		resR3,_ := strconv.Atoi(solicitudes[i])
-		if resR3 == ronda3valor{
-			fmt.Println("Jugador "+stringjugador+" Ha MUERTO")
-			status[i] = 0
-			respuestas[i] = "MUERTO"
-		} else {
-			juego1sumas[i] += resR3
-			respuestas[i] = "OK"
+			//Procesado de respuesta
+			resR3,_ := strconv.Atoi(solicitudes[i])
+			if resR3 == ronda3valor{
+				fmt.Println("Jugador "+stringjugador+" Ha MUERTO")
+				status[i] = 0
+				respuestas[i] = "MUERTO 1"
+				err = ch.Publish(
+				"",
+				"TestQueue",
+				false,
+				false,
+				amqp.Publishing{
+					ContentType: "text/plain",
+					Body: []byte("MUERTE,"+stringjugador+",1"),
+				},
+				)
+
+				if err != nil {
+					fmt.Println(err)
+					panic(err)
+				}
+			} else {
+				juego1sumas[i] += resR3
+				respuestas[i] = "VIVO 1"
+			}
 		}
 	}
+	VaciarSolicitudes()
+	flagListo = 1
 
+	//RECEPCION DE SOLICITUDES POR PARTE DE LOS USUARIOS PARA RONDA 4
+	//INICIALIZACION VARIABLES RONDA 4
+	rand.Seed(time.Now().UnixNano())
+	ronda4valor := (rand.Intn(4)+6)
 
+	fmt.Println("[*] Esperando respuestas Ronda 4 Juego 1...")
+	for tamanio(solicitudes) < tamanio2(status){
+		
+	}
+	flagListo = 0
+	VaciarRespuestas()
 
-	
-	
+	for i:=1; i<17; i++{
+		if status[i] == 1{
+			if juego1sumas[i] < 21{
+				//Previo a procesar la respuesta se registra en el log de NameNode:
+				stringjugador := strconv.Itoa(i)
+				
+				res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
+				Body: "JUGA,"+stringjugador+",1,"+solicitudes[i],
+				})
+				if err != nil {
+					panic("Error con la solicitud para ir registrando el historial de un jugador: "+ err.Error())	
+				}else{
+					fmt.Println(res.Body)
+				}
 
+				//Procesado de respuesta
+				resR4,_ := strconv.Atoi(solicitudes[i])
+				if resR4 == ronda4valor{
+					fmt.Println("Jugador "+stringjugador+" Ha MUERTO")
+					status[i] = 0
+					respuestas[i] = "MUERTO FIN"
+					err = ch.Publish(
+						"",
+						"TestQueue",
+						false,
+						false,
+						amqp.Publishing{
+							ContentType: "text/plain",
+							Body: []byte("MUERTE,"+stringjugador+",1"),
+						},
+						)
 
+						if err != nil {
+							fmt.Println(err)
+							panic(err)
+						}
+				} else {
+					juego1sumas[i] += resR4
+					respuestas[i] = "VIVO FIN"
+				}
+			}else{
+				respuestas[i] = "VIVO FIN"
+			}
+		}
+	}
+	VaciarSolicitudes()
+	flagListo = 1
+
+	//PREPARACION JUEGO 2:
+	fmt.Println("[*] Preparando todo para Juego 2...")
+	for tamanio(solicitudes) < tamanio2(status){
+		
+	}
+	flagListo = 0
+	VaciarRespuestas()
+	if tamanio2(status)%2 != 0{
+		actual := tamanio2(status)
+		rand.Seed(time.Now().UnixNano())
+		amatar := (rand.Intn(15)+1)
+		for tamanio2(status) == actual{
+			if status[amatar] == 1{
+				status[amatar] = 0
+				fmt.Println("Jugador "+strconv.Itoa(amatar)+" Ha MUERTO")
+				err = ch.Publish(
+				"",
+				"TestQueue",
+				false,
+				false,
+				amqp.Publishing{
+					ContentType: "text/plain",
+					Body: []byte("MUERTE,"+strconv.Itoa(amatar)+",2"),
+				},
+				)
+
+				if err != nil {
+					fmt.Println(err)
+					panic(err)
+				}
+			} else{
+				amatar = (rand.Intn(15)+1)
+			}
+		}
+	}
+	for i:=1; i<17; i++{
+		if status[i] == 1{
+			respuestas[i] = "VIVO"
+		} else {
+			respuestas[i] = "MUERTO"
+		}
+	}
+	//Armado de equipos:
+	var equipo1 []int
+	var Nequipo1 = 0
+	var Nequipo2 = 0
+	aequipo := (rand.Intn(15)+1)
+	for len(equipo1) != (tamanio2(status)/2){
+		if (status[aequipo] == 1){
+			equipo1 = append(equipo1,aequipo)
+			aequipo = (rand.Intn(15)+1)
+		}else{
+			aequipo = (rand.Intn(15)+1)
+		}
+	}
+	VaciarSolicitudes()
+	flagListo = 1
+
+	// ###############################################################################
+	//JUEGO 2 
+	// ###############################################################################
+	for tamanio(solicitudes) < tamanio2(status){
+		
+	}
+	flagListo = 0
+	VaciarRespuestas()
+	//SE ASUME QUE A ESTE PUNTO SE RECIBEN TODAS LAS SOLICITUDES.
+	//PROCESAMIENTO JUEGO 1:
+	PromptLider = -1
+	for PromptLider != 0{
+		fmt.Println("Todo listo para el Juego 2!")
+		fmt.Println("Seleccione una opción para continuar escribiendo un número:\n")
+		fmt.Println("0) Dar inicio al juego 1 de Squid Game <コ:彡")
+		fmt.Println("Ingrese un numero del 1 al 16 para consultar el historial de un jugador")
+		fmt.Scanln(&PromptLider)
+		if PromptLider != 0{
+			res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
+			Body: "DATA,Jugador_"+strconv.Itoa(PromptLider)+",Ronda_1",
+			})
+			if err != nil {
+				panic("Error con la solicitud para ir registrando el historial de un jugador: "+err.Error())	
+			}else{
+				fmt.Println(res.Body)
+			}
+			PromptLider = -1
+		}
+	}
+	fmt.Println("[*] Esperando respuestas Juego 2...")
+	NJuego2 := (rand.Intn(15)+1)
+	for i:=1; i<17; i++{
+		banderita := 0
+		if status[i] == 1{
+			ingresado,_ := strconv.Atoi(solicitudes[i])
+			res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
+			Body: "JUGA,"+strconv.Itoa(i)+",2,"+solicitudes[i],
+			})
+			if err != nil {
+				panic("Error con la solicitud para ir registrando el historial de un jugador: "+ err.Error())	
+			}else{
+				fmt.Println(res.Body)
+			}
+			for _,b := range equipo1{
+				if b == i{
+					banderita = 1
+					Nequipo1+=ingresado
+				}	
+			}
+			if banderita != 1{
+				Nequipo2+=ingresado
+			}
+		}
+	}
+	//Si las paridades son iguales pero distintas a las del lider.
+	flagmatanza := 0
+	if (Nequipo1%2 == Nequipo2%2) && (Nequipo1%2 != NJuego2%2) {
+		//SE MATA UN EQUIPO AL AZAR
+		flagmatanza = 1
+		equipoamatar := (rand.Intn(1)+1)
+		if equipoamatar == 1{
+			for i,_ := range status{
+				for _,b := range equipo1{
+					if i == b{
+						respuestas[i] = "MUERTO"
+						status[i] = 0
+						fmt.Println("Jugador "+strconv.Itoa(i)+"ha MUERTO")
+						err = ch.Publish(
+							"",
+							"TestQueue",
+							false,
+							false,
+							amqp.Publishing{
+								ContentType: "text/plain",
+								Body: []byte("MUERTE,"+strconv.Itoa(i)+",2"),
+							},
+							)
+
+							if err != nil {
+								fmt.Println(err)
+								panic(err)
+							}
+					}
+				}
+				if respuestas[i] != "MUERTO"{
+					respuestas[i] = "VIVO"
+				}
+			} 
+		}else{
+			for i,_ := range status{
+				for _,b := range equipo1{
+					if i == b{
+						respuestas[i] = "VIVO"
+					}
+				}
+				if respuestas[i] != "VIVO"{
+					respuestas[i] = "MUERTO"
+					status[i] = 0
+					fmt.Println("Jugador "+strconv.Itoa(i)+"ha MUERTO")
+					err = ch.Publish(
+						"",
+						"TestQueue",
+						false,
+						false,
+						amqp.Publishing{
+							ContentType: "text/plain",
+							Body: []byte("MUERTE,"+strconv.Itoa(i)+",2"),
+						},
+						)
+
+						if err != nil {
+							fmt.Println(err)
+							panic(err)
+						}
+				}
+			} 
+		}
+	}else if (Nequipo1%2 == NJuego2%2){
+		flagmatanza = 1
+		for i,_ := range status{
+			for _,b := range equipo1{
+				if i == b{
+					respuestas[i] = "VIVO"
+				}
+			}
+			if respuestas[i] != "VIVO"{
+				respuestas[i] = "MUERTO"
+				status[i] = 0
+				fmt.Println("Jugador "+strconv.Itoa(i)+"ha MUERTO")
+				err = ch.Publish(
+					"",
+					"TestQueue",
+					false,
+					false,
+					amqp.Publishing{
+						ContentType: "text/plain",
+						Body: []byte("MUERTE,"+strconv.Itoa(i)+",2"),
+					},
+					)
+
+					if err != nil {
+						fmt.Println(err)
+						panic(err)
+					}
+			}
+		}
+	}else{
+		flagmatanza = 1
+		for i,_ := range status{
+			for _,b := range equipo1{
+				if i == b{
+					respuestas[i] = "MUERTO"
+					status[i] = 0
+					fmt.Println("Jugador "+strconv.Itoa(i)+"ha MUERTO")
+					err = ch.Publish(
+					"",
+					"TestQueue",
+					false,
+					false,
+					amqp.Publishing{
+						ContentType: "text/plain",
+						Body: []byte("MUERTE,"+strconv.Itoa(i)+",2"),
+					},
+					)
+
+					if err != nil {
+						fmt.Println(err)
+						panic(err)
+					}
+				}
+			}
+			if respuestas[i] != "MUERTO"{
+				respuestas[i] = "VIVO"
+			}
+		}
+	}
+	if flagmatanza == 0{
+		for i:=1 ; i<17; i++{
+			respuestas[i] = "VIVO"
+		}
+	}
+	VaciarSolicitudes()
+	flagListo = 1
+	// ###############################################################################
+	//JUEGO 3 
+	// ###############################################################################
+	if tamanio2(status)%2 != 0{
+		actual := tamanio2(status)
+		rand.Seed(time.Now().UnixNano())
+		amatar := (rand.Intn(15)+1)
+		for tamanio2(status) == actual{
+			if status[amatar] == 1{
+				status[amatar] = 0
+				fmt.Println("Jugador "+strconv.Itoa(amatar)+"ha MUERTO")
+				err = ch.Publish(
+					"",
+					"TestQueue",
+					false,
+					false,
+					amqp.Publishing{
+						ContentType: "text/plain",
+						Body: []byte("MUERTE,"+strconv.Itoa(amatar)+",3"),
+					},
+					)
+
+					if err != nil {
+						fmt.Println(err)
+						panic(err)
+					}
+			} else{
+				amatar = (rand.Intn(15)+1)
+			}
+		}
+	}
+	for i:=1; i<17; i++{
+		if status[i] == 1{
+			respuestas[i] = "VIVO"
+		} else {
+			respuestas[i] = "MUERTO"
+		}
+	}
+	//Armado de equipos:
+	var equipos [][]int
+	var tempequi []int
+	for i,v := range status{
+		if v == 1{
+			tempequi = append(tempequi,i)
+			if len(tempequi) == 2{
+				equipos = append(equipos, tempequi)
+				tempequi = nil
+			}
+		}
+	}
+	for tamanio(solicitudes) < tamanio2(status){
+		
+	}
+	flagListo = 0
+	VaciarRespuestas()
+	PromptLider = -1
+	for PromptLider != 0{
+		fmt.Println("Todo listo para el Juego 3! RONDA FINAL")
+		fmt.Println("Seleccione una opción para continuar escribiendo un número:\n")
+		fmt.Println("0) Dar inicio al juego 1 de Squid Game <コ:彡")
+		fmt.Println("Ingrese un numero del 1 al 16 para consultar el historial de un jugador")
+		fmt.Scanln(&PromptLider)
+		if PromptLider != 0{
+			res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
+			Body: "DATA,Jugador_"+strconv.Itoa(PromptLider)+",Ronda_1",
+			})
+			if err != nil {
+				panic("Error con la solicitud para ir registrando el historial de un jugador: "+err.Error())	
+			}else{
+				fmt.Println(res.Body)
+			}
+			res, err = serviceClient.Intercambio(context.Background(), &pb.Mensaje{
+			Body: "DATA,Jugador_"+strconv.Itoa(PromptLider)+",Ronda_2",
+			})
+			if err != nil {
+				panic("Error con la solicitud para ir registrando el historial de un jugador: "+err.Error())	
+			}else{
+				fmt.Println(res.Body)
+			}
+			PromptLider = -1
+		}
+	}
+	fmt.Println("[*] Esperando respuestas Juego 3...")
+	NJuego3 := (rand.Intn(9)+1)
+	for _,v := range equipos{
+		jugador1 := v[0] 
+		vjugador1,_ := strconv.Atoi(solicitudes[jugador1])
+		jugador2 := v[1]
+		vjugador2,_:= strconv.Atoi(solicitudes[jugador2])
+		res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
+			Body: "JUGA,"+strconv.Itoa(jugador1)+",3,"+solicitudes[jugador1],
+			})
+			if err != nil {
+				panic("Error con la solicitud para ir registrando el historial de un jugador: "+ err.Error())	
+			}else{
+				fmt.Println(res.Body)
+			}
+		res, err = serviceClient.Intercambio(context.Background(), &pb.Mensaje{
+			Body: "JUGA,"+strconv.Itoa(jugador2)+",3,"+solicitudes[jugador2],
+			})
+			if err != nil {
+				panic("Error con la solicitud para ir registrando el historial de un jugador: "+ err.Error())	
+			}else{
+				fmt.Println(res.Body)
+			}
+		if math.Abs(float64(vjugador1 - NJuego3)) < math.Abs(float64(vjugador2 - NJuego3)){
+			respuestas[jugador1] = "VIVO"
+			respuestas[jugador2] = "MUERTO"
+			status[jugador2] = 0
+			fmt.Println("Jugador "+strconv.Itoa(jugador2)+"ha MUERTO")
+			err = ch.Publish(
+				"",
+				"TestQueue",
+				false,
+				false,
+				amqp.Publishing{
+					ContentType: "text/plain",
+					Body: []byte("MUERTE,"+strconv.Itoa(jugador2)+",3"),
+				},
+				)
+
+				if err != nil {
+					fmt.Println(err)
+					panic(err)
+				}
+		} else if math.Abs(float64(vjugador1 - NJuego3)) > math.Abs(float64(vjugador2 - NJuego3)){
+			respuestas[jugador2] = "VIVO"
+			respuestas[jugador1] = "MUERTO"
+			status[jugador1] = 0
+			fmt.Println("Jugador "+strconv.Itoa(jugador1)+"ha MUERTO")
+			err = ch.Publish(
+				"",
+				"TestQueue",
+				false,
+				false,
+				amqp.Publishing{
+					ContentType: "text/plain",
+					Body: []byte("MUERTE,"+strconv.Itoa(jugador1)+",3"),
+				},
+				)
+
+				if err != nil {
+					fmt.Println(err)
+					panic(err)
+				}
+		} else {
+			respuestas[jugador1] = "VIVO"
+			respuestas[jugador2] = "VIVO"
+		}
+	}
+	VaciarSolicitudes()
+	flagListo = 1
+	fmt.Println("Squid Game TERMINADO")
+	fmt.Println("GANADORES:")
+	for i,v := range status{
+		if v == 1{
+			fmt.Println("Jugador "+strconv.Itoa(i))
+		}
+	}
+	fmt.Println("Antes de finalizar, puede hacer lo siguiente:")
+	PromptLider = -1
+	for PromptLider != 0{
+		fmt.Println("Seleccione una opción para continuar escribiendo un número:\n")
+		fmt.Println("0) Dar término al Squid Game <コ:彡")
+		fmt.Println("Ingrese un numero del 1 al 16 para consultar el historial de un jugador")
+		fmt.Scanln(&PromptLider)
+		if PromptLider != 0{
+			res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
+			Body: "DATA,Jugador_"+strconv.Itoa(PromptLider)+",Ronda_1",
+			})
+			if err != nil {
+				panic("Error con la solicitud para ir registrando el historial de un jugador: "+err.Error())	
+			}else{
+				fmt.Println(res.Body)
+			}
+			res, err = serviceClient.Intercambio(context.Background(), &pb.Mensaje{
+			Body: "DATA,Jugador_"+strconv.Itoa(PromptLider)+",Ronda_2",
+			})
+			if err != nil {
+				panic("Error con la solicitud para ir registrando el historial de un jugador: "+err.Error())	
+			}else{
+				fmt.Println(res.Body)
+			}
+			res, err = serviceClient.Intercambio(context.Background(), &pb.Mensaje{
+			Body: "DATA,Jugador_"+strconv.Itoa(PromptLider)+",Ronda_3",
+			})
+			if err != nil {
+				panic("Error con la solicitud para ir registrando el historial de un jugador: "+err.Error())	
+			}else{
+				fmt.Println(res.Body)
+			}
+			PromptLider = -1
+		}
+	}
+	fmt.Println("Gracias por jugar...")
 }

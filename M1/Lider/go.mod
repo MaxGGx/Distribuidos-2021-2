@@ -3,7 +3,8 @@ module github.com/MaxGGx/Distribuidos-2021-2/M1/Test3/proto
 go 1.17
 
 require (
-	github.com/MaxGGx/Distribuidos-2021-2/M1/Test3 v0.0.0-20211030160604-7bea45895b23
+	github.com/MaxGGx/Distribuidos-2021-2/M1/Test3 v0.0.0-20211104064313-f4c786047792
+	github.com/streadway/amqp v1.0.0
 	google.golang.org/grpc v1.42.0
 )
 
