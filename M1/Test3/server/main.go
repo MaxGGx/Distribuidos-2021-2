@@ -6,7 +6,6 @@ import (
 	pb "github.com/MaxGGx/Distribuidos-2021-2/M1/Test3/proto"
 	"google.golang.org/grpc"
 	"net"
-	"time"
 )
 
 type server struct {

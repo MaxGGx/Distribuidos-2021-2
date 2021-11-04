@@ -5,6 +5,8 @@ import (
 	"fmt"
 	pb "github.com/MaxGGx/Distribuidos-2021-2/M1/Test3/proto"
 	"google.golang.org/grpc"
+	"reflect"
+	"strconv"
 )
 
 func main() {
@@ -15,14 +17,20 @@ func main() {
 	}
 
 	serviceClient := pb.NewEntradaMensajeClient(conn)
+	fmt.Println(reflect.TypeOf(serviceClient))
 
-	res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
-		Body: "Palabra 2",
+	for i:=1 ; i<17;i++{
+		valor := strconv.Itoa(i)
+		res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
+		Body: valor+" Listo?",
 	})
-
 	if err != nil {
 		panic("Mensaje no pudo ser creado ni enviado: "+ err.Error())
 	}
-
 	fmt.Println(res.Body)
+	}
+	
+
+	
+
 }
