@@ -15,20 +15,17 @@ import(
 FORMATO PARA JUGADOR ELIMINADO: ("MUERTE",JUGADOR,RONDA)
 FORMATO PARA POZO ("POZO")
 */
-var pozo := 0
+var pozo = 0
 
 type server struct {
 	pb.UnimplementedEntradaMensajeServer
 }
 
 func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaje, error) {
-	//res := pozo
+	res := ""
 	fmt.Println("Se recibió el siguiente mensaje: "+ req.Body)
 	response := strings.Split(string(req.Body)," ")
-	if response[1] == "POZO"{
-		res := pozo
-	}
-	return &pb.Mensaje{Body: res}, nil 
+	return &pb.Mensaje{Body: string(res)}, nil 
 }
 
 //Toma los mjes de llegada y los procesa, mostrando por pantalla los mensajes acutales.
@@ -38,15 +35,16 @@ func Recepcion(mensaje string) (resmje string){
 	fmt.Println("Mensajes recibidos:")
 	fmt.Println(temp)
 	resmje = "[*] Respuesta Recibida"
-	return
+	return string(valor)
 }
 
 //Retorno de respuesta a jugador que la solicitó
 func Delivery(mensaje string) (respuesta string){
 	temp := strings.Split(mensaje, " ")
 	valor,_ := strconv.Atoi(temp[0])
-	respuesta = respuestas[valor]
-	return
+	//respuesta = respuestas[valor]
+	return string(valor)
+
 }
 
 func main() {
