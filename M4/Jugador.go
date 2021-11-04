@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	pb "/proto"
-
+	pb ".\proto"
 	"google.golang.org/grpc"
 )
 
@@ -33,7 +32,8 @@ func Opciones() {
 
 }
 
-func Solicitud(serviceClient *proto.entradaMensajeClient) {
+/*
+func Solicitud(serviceClient *pb.EntradaMensajeClient) {
 	res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
 		Body: "ARCHIVO,Jugador_9,Ronda_3",
 	})
@@ -43,7 +43,9 @@ func Solicitud(serviceClient *proto.entradaMensajeClient) {
 	}
 
 	fmt.Println(res.Body)
-}
+
+	return res.body
+}*/
 func main() {
 
 	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
@@ -51,6 +53,16 @@ func main() {
 		panic("No se puede conectar al servidor " + err.Error())
 	}
 	serviceClient := pb.NewEntradaMensajeClient(conn)
+
+	res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
+		Body: "ARCHIVO,Jugador_9,Ronda_3",
+	})
+
+	if err != nil {
+		panic("Mensaje no pudo ser creado ni enviado: " + err.Error())
+	}
+
+	fmt.Println(res.Body)
 
 	var unirse int
 	fmt.Println("Desea unirse al Juego?")
