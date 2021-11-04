@@ -22,10 +22,16 @@ type server struct {
 }
 
 func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaje, error) {
-	res := ""
 	fmt.Println("Se recibió el siguiente mensaje: "+ req.Body)
-	response := strings.Split(string(req.Body)," ")
-	return &pb.Mensaje{Body: string(res)}, nil 
+	//response := strings.Split(string(req.Body)," ")
+	res := Recepcion(req.Body)
+	listita := strings.Split(res, " ")
+	fmt.Println(strconv.Itoa(pozo))
+	if listita[0] == "POZO"{
+		fmt.Println("Enviando POZO: "+strconv.Itoa(pozo))
+		return &pb.Mensaje{Body: strconv.Itoa(pozo)}, nil 
+	}
+	return &pb.Mensaje{Body: strconv.Itoa(pozo)}, nil 
 }
 
 //Toma los mjes de llegada y los procesa, mostrando por pantalla los mensajes acutales.
@@ -34,7 +40,11 @@ func Recepcion(mensaje string) (resmje string){
 	valor, _ := strconv.Atoi(temp[0])
 	fmt.Println("Mensajes recibidos:")
 	fmt.Println(temp)
+	if temp[0] == "POZO"{
+		return "POZO "+string(pozo)
+	}
 	resmje = "[*] Respuesta Recibida"
+
 	return string(valor)
 }
 
@@ -97,8 +107,10 @@ func main() {
 	go func() {
 		for d := range msgs{
 			fmt.Printf("Mensaje recibido: %s\n", d.Body)
-			response := strings.Split(string(d.Body),",")
+			response := strings.Split(string(d.Body)," ")
+			//fmt.Println("Se recibió el siguiente mensaje: "+ response)
 			if response[1] == "DEAD"{
+				fmt.Println("ENTRANDO A SUMAR POZO")
 				pozo += 100000000
 				data := []byte("Jugador_"+string(response[0])+" Ronda_"+string(response[2])+" "+strconv.Itoa(pozo)+"\n")
 				_, err2 := f.Write(data)

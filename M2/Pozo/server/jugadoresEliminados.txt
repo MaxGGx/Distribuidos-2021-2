@@ -1,0 +1,9 @@
+Jugador_J1 Ronda_3 100000000
+Jugador_J1 Ronda_3 200000000
+Jugador_J1 Ronda_3 300000000
+Jugador_J1 Ronda_3 400000000
+Jugador_J1 Ronda_3 500000000
+Jugador_J1 Ronda_3 600000000
+Jugador_J1 Ronda_3 700000000
+Jugador_J1 Ronda_3 800000000
+Jugador_J1 Ronda_3 900000000
