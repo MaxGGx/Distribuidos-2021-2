@@ -1,10 +1,9 @@
 package main
 
 import (
-	"context"
 	"fmt"
 
-	pb ".\proto"
+	pb "github.com/MaxGGx/Distribuidos-2021-2/M1/Test3/proto"
 	"google.golang.org/grpc"
 )
 
@@ -53,17 +52,17 @@ func main() {
 		panic("No se puede conectar al servidor " + err.Error())
 	}
 	serviceClient := pb.NewEntradaMensajeClient(conn)
+	/*
+		res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
+			Body: "ARCHIVO,Jugador_9,Ronda_3",
+		})
 
-	res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
-		Body: "ARCHIVO,Jugador_9,Ronda_3",
-	})
+		if err != nil {
+			panic("Mensaje no pudo ser creado ni enviado: " + err.Error())
+		}
 
-	if err != nil {
-		panic("Mensaje no pudo ser creado ni enviado: " + err.Error())
-	}
-
-	fmt.Println(res.Body)
-
+		fmt.Println(res.Body)
+	*/
 	var unirse int
 	fmt.Println("Desea unirse al Juego?")
 	fmt.Println("1. Si")
