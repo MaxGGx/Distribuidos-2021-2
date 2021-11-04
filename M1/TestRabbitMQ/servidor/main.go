@@ -4,7 +4,7 @@ import(
 	"fmt"
 	"github.com/streadway/amqp"
 )
-
+//J1 DEAD
 func main() {
 	fmt.Println("Aplicacion consumidor (Server)")
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")

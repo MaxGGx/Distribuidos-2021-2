@@ -15,7 +15,7 @@ import(
 FORMATO PARA JUGADOR ELIMINADO: ("MUERTE",JUGADOR,RONDA)
 FORMATO PARA POZO ("POZO")
 */
-var pozo = 11
+var pozo = 0
 
 type server struct {
 	pb.UnimplementedEntradaMensajeServer
@@ -82,9 +82,9 @@ func main() {
 		for d := range msgs{
 			fmt.Printf("Mensaje recibido: %s\n", d.Body)
 			response := strings.Split(string(d.Body),",")
-			if response[0] == "MUERTE"{
+			if response[1] == "DEAD"{
 				pozo += 100000000
-				data := []byte("Jugador_"+string(response[1])+" Ronda_"+string(response[2])+" "+strconv.Itoa(pozo)+"\n")
+				data := []byte("Jugador_"+string(response[0])+" Ronda_"+string(response[2])+" "+strconv.Itoa(pozo)+"\n")
 				_, err2 := f.Write(data)
 				if err2 != nil {
 			        fmt.Println(err2)
