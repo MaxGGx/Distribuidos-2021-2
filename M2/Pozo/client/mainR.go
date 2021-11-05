@@ -11,7 +11,7 @@ func main() {
 	fmt.Println("Test RabbitMQ")
 
 	//conn, err := amqp.Dial("amqp://g@uest:guestlocalhost:5672/")
-	conn, err := amqp.Dial("amqp://prueba:prueba@dist33:5672/")
+	conn, err := amqp.Dial("amqp://prueba:prueba@dist34:5672/")
 	if err != nil {
 		fmt.Println(err)
 		panic(err)
