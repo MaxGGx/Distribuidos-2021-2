@@ -158,8 +158,8 @@ func IA(Jugador int, Channel chan int) {
 			res := Solicitud(serviceClient, strconv.Itoa(Jugador)+" Listo?")
 			if res != "[*] Processing..." {
 				l := strings.Split(res, " ")
-				fmt.Println("ASDASDASD")
-				fmt.Println(res)
+				//fmt.Println("ASDASDASD")
+				//fmt.Println(res)
 				if (l[0] == "MUERTO") && (l[1] == "FIN") {
 					//fmt.Println("Has sido eliminado")
 					Channel <- 1

@@ -79,8 +79,8 @@ func Recepcion(mensaje string) (resmje string){
 	temp := strings.Split(mensaje, " ")
 	valor, _ := strconv.Atoi(temp[0])
 	solicitudes[valor] = temp[1]
-	//fmt.Println("Mensajes de jugadores recibidos:")
-	//fmt.Println(solicitudes)
+	fmt.Println("Mensajes de jugadores recibidos:")
+	fmt.Println(solicitudes)
 	if tamanio(solicitudes) == tamanio2(status){
 		flagListo = 0
 	}
