@@ -105,23 +105,21 @@ func IA(Jugador int, Channel chan int) {
 					l := strings.Split(res, " ")
 
 					if l[0] != "VIVO" {
-						Vivo = false
+						Channel <- 1
+						return
 					}
 
 					if l[1] == "FIN" {
 						Fin = true
 					}
+
+					if l[2] == "GANADOR" {
+						Channel <- 1
+						return
+					}
 				}
 			}
-
 			Total += jugada
-			//fmt.Printf("Total del jugador: %d\n", Total)
-
-			if !Vivo {
-				//fmt.Println("Has perdido, estas muerto")
-				Channel <- 1
-				return
-			}
 			ronda++
 		}
 
@@ -132,8 +130,8 @@ func IA(Jugador int, Channel chan int) {
 		for flag {
 			res := Solicitud(serviceClient, strconv.Itoa(Jugador)+" Listo?")
 			if res != "[*] Processing..." {
+
 				if res == "MUERTO" {
-					//fmt.Println("Has sido eliminado")
 					Channel <- 1
 					return
 				} else {
@@ -141,6 +139,7 @@ func IA(Jugador int, Channel chan int) {
 				}
 			}
 		}
+
 		flag = true
 
 		//fmt.Printf("\n----------Etapa 2----------\n\n")
@@ -158,7 +157,9 @@ func IA(Jugador int, Channel chan int) {
 		for flag {
 			res := Solicitud(serviceClient, strconv.Itoa(Jugador)+" Listo?")
 			if res != "[*] Processing..." {
-				if res == "MUERTO" {
+				l := strings.Split(res, " ")
+
+				if l[0] == "MUERTO" {
 					//fmt.Println("Has sido eliminado")
 					Channel <- 1
 					return
@@ -166,18 +167,26 @@ func IA(Jugador int, Channel chan int) {
 			}
 		}
 		////////////////////////Etapa 3/////////////////////////////
+
+		Solicitud(serviceClient, strconv.Itoa(Jugador)+" Sol3")
+		for flag {
+			res := Solicitud(serviceClient, strconv.Itoa(Jugador)+" Listo?")
+			if res != "[*] Processing..." {
+				l := strings.Split(res, " ")
+				if l[0] == "MUERTO" {
+					Channel <- 1
+					return
+				} else {
+					flag = false
+				}
+
+				if l[2] == "GANADOR" {
+					Channel <- 1
+					return
+				}
+			}
+		}
 		ronda = 1
-		//Ganador := false
-
-		//for Vivo && !Ganador {
-		//fmt.Printf("\n----------Etapa 3----------\n\n")
-		//fmt.Printf("Todo o Nada\n\n")
-		//fmt.Println("Reglas:")
-		//fmt.Println("- Elegir un numero entre 1 y 10 ")
-		//fmt.Println()
-
-		//fmt.Printf("Eleccion del numero para la Etapa 3, ronda %d\n", ronda)
-
 		jugada = Jugada(10)
 		Solicitud(serviceClient, strconv.Itoa(Jugador)+" "+strconv.Itoa(jugada))
 
@@ -186,9 +195,8 @@ func IA(Jugador int, Channel chan int) {
 			res := Solicitud(serviceClient, strconv.Itoa(Jugador)+" Listo?")
 			if res != "[*] Processing..." {
 				flag = false
-				l:=strings.Split(res," ")
+				l := strings.Split(res, " ")
 				if l[0] != "VIVO" {
-					//fmt.Println("Has sido eliminado")
 					Channel <- 1
 					return
 				} else {
@@ -196,13 +204,11 @@ func IA(Jugador int, Channel chan int) {
 				}
 			}
 		}
-		//ronda += 1
-		//}
-		//fmt.Println("Has ganado el Juego del Calamar")
+
+		Solicitud(serviceClient, strconv.Itoa(Jugador)+" Sol4")
 		Channel <- 1
 	}
 }
-
 func Jugador(Channel chan int) {
 
 	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
@@ -265,11 +271,19 @@ func Jugador(Channel chan int) {
 					l := strings.Split(res, " ")
 
 					if l[0] != "VIVO" {
-						Vivo = false
+						fmt.Println("Has perdido, estas muerto")
+						Channel <- 1
+						return
 					}
 
 					if l[1] == "FIN" {
 						Fin = true
+					}
+
+					if l[2] == "GANADOR" {
+						fmt.Println("Has ganado el Juego del Calamar")
+						Channel <- 1
+						return
 					}
 				}
 			}
@@ -277,11 +291,6 @@ func Jugador(Channel chan int) {
 			Total += jugada
 			fmt.Printf("Total del jugador: %d\n", Total)
 
-			if !Vivo {
-				fmt.Println("Has perdido, estas muerto")
-				Channel <- 1
-				return
-			}
 			ronda++
 		}
 
@@ -318,32 +327,39 @@ func Jugador(Channel chan int) {
 		for flag {
 			res := Solicitud(serviceClient, "16 Listo?")
 			if res != "[*] Processing..." {
-				if res == "MUERTO" {
+				l := strings.Split(res, " ")
+				if l[0] == "MUERTO" {
 					fmt.Println("Has sido eliminado")
 					Channel <- 1
 					return
 				}
 			}
 		}
+
 		////////////////////////Etapa 3/////////////////////////////
 		Solicitud(serviceClient, "16 Sol3")
 		for flag {
 			res := Solicitud(serviceClient, "16 Listo?")
 			if res != "[*] Processing..." {
-				if res == "MUERTO" {
+				l := strings.Split(res, " ")
+				if l[0] == "MUERTO" {
 					fmt.Println("Has sido eliminado")
 					Channel <- 1
 					return
 				} else {
 					flag = false
 				}
+
+				if l[2] == "GANADOR" {
+					fmt.Println("Has ganado el Juego del Calamar")
+					Channel <- 1
+					return
+				}
 			}
 		}
 		Opciones(serviceClient)
 		ronda = 1
-		//Ganador := false
 
-		//for Vivo && !Ganador {
 		fmt.Printf("\n----------Etapa 3----------\n\n")
 		fmt.Printf("Todo o Nada\n\n")
 		fmt.Println("Reglas:")
@@ -360,18 +376,17 @@ func Jugador(Channel chan int) {
 			res := Solicitud(serviceClient, "16 Listo?")
 			if res != "[*] Processing..." {
 				flag = false
-				if res != "VIVO" {
+				l := strings.Split(res, " ")
+				if l[0] != "VIVO" {
 					fmt.Println("Has sido eliminado")
 					Channel <- 1
 					return
 				}
 			}
 		}
-		//	ronda += 1
-		//}
+		Solicitud(serviceClient, "16 Sol4")
 		fmt.Println("Has ganado el Juego del Calamar")
 		Channel <- 1
-		return
 	}
 }
 
