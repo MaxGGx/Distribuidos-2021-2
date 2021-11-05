@@ -24,7 +24,6 @@ func Solicitud(serviceClient pb.EntradaMensajeClient, msg string) string {
 }
 
 func Jugada(limit int) int {
-	rand.Seed(time.Now().UnixNano())
 	n := rand.Intn(limit) + 1
 	return n
 }
@@ -67,7 +66,6 @@ func IA(Jugador int, Channel chan int) {
 
 	Solicitud(serviceClient, strconv.Itoa(Jugador)+" Sol1")
 	flag = true
-	fmt.Println()
 
 	for flag {
 		if Solicitud(serviceClient, strconv.Itoa(Jugador)+" Listo?") != "[*] Processing..." {
@@ -138,12 +136,14 @@ func IA(Jugador int, Channel chan int) {
 					//fmt.Println("Has sido eliminado")
 					Channel <- 1
 					return
+				} else {
+					flag = false
 				}
 			}
 		}
 		flag = true
 
-		fmt.Printf("\n----------Etapa 2----------\n\n")
+		//fmt.Printf("\n----------Etapa 2----------\n\n")
 		//fmt.Printf("Tirar la cuerda\n\n")
 		//fmt.Println("Reglas:")
 		//fmt.Println("- Elegir un numero entre 1 y 4 para igualar la paridad del\n numero elegido por el lider")
@@ -186,11 +186,13 @@ func IA(Jugador int, Channel chan int) {
 			res := Solicitud(serviceClient, strconv.Itoa(Jugador)+" Listo?")
 			if res != "[*] Processing..." {
 				flag = false
-
-				if res != "VIVO" {
+				l:=strings.Split(res," ")
+				if l[0] != "VIVO" {
 					//fmt.Println("Has sido eliminado")
 					Channel <- 1
 					return
+				} else {
+					flag = false
 				}
 			}
 		}
@@ -294,6 +296,8 @@ func Jugador(Channel chan int) {
 					fmt.Println("Has sido eliminado")
 					Channel <- 1
 					return
+				} else {
+					flag = false
 				}
 			}
 		}
@@ -330,6 +334,8 @@ func Jugador(Channel chan int) {
 					fmt.Println("Has sido eliminado")
 					Channel <- 1
 					return
+				} else {
+					flag = false
 				}
 			}
 		}
@@ -370,10 +376,11 @@ func Jugador(Channel chan int) {
 }
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
 	nJugadores := 15
 	Channel := make(chan int, nJugadores)
 
-	for i := 0; i < nJugadores; i++ {
+	for i := 1; i <= nJugadores; i++ {
 		go IA(i, Channel)
 	}
 

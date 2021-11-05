@@ -53,7 +53,7 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 		if _, err = f.WriteString(request[2]+"\n"); err != nil {
     		panic(err)
 		}
-		res = "Agregado exitosamente"
+		res = "Jugada agregada exitosamente"
 	}
 
 	return &pb.Mensaje{Body: res}, nil 
