@@ -1,2 +1,3 @@
 run:
-	go run "Lider/server/main.go"
+	cd "Lider/server"
+	go run main.go
