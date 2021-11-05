@@ -62,7 +62,7 @@ func main() {
 	defer f.Close()
 	
 	fmt.Println("Aplicacion consumidor (Server)")
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://prueba:prueba@localhost:5672/")
 	if err != nil {
 		fmt.Println(err)
 		panic(err)
