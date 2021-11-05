@@ -194,7 +194,7 @@ func main() {
 
 
 	//CONEXION A NAME NODE IP: M3:
-	conn3, err := grpc.Dial("localhost:50052", grpc.WithInsecure())
+	conn3, err := grpc.Dial("dist35:50052", grpc.WithInsecure())
 	if err != nil {
 		panic("No se puede conectar al servidor "+ err.Error())
 	}
