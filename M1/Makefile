@@ -1,2 +1,2 @@
 run:
-	go run Lider/server/main.go
+	go run "Lider/server/main.go"
