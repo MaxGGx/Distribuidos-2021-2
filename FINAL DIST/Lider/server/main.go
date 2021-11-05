@@ -127,7 +127,7 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 	//Para pedir monto de pozo jugador debe hacer "<N jugador> POZO"
 	}else if strings.Contains(req.Body, "POZO"){
 
-		conn1, err1 := grpc.Dial("localhost:50056", grpc.WithInsecure())
+		conn1, err1 := grpc.Dial("dist34:50056", grpc.WithInsecure())
 		if err1 != nil {
 			panic("No se puede conectar al Data Node 1 "+ err1.Error())
 		}
@@ -172,7 +172,7 @@ func main() {
 	
 	//CONEXION A SERVIDOR RABBIT MQ AGREGAR IP AQUI
 	
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://prueba:prueba@dist34:5672/")
 	if err != nil {
 		fmt.Println(err)
 		panic(err)
