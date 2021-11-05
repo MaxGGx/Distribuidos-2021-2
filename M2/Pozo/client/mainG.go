@@ -8,8 +8,8 @@ import (
 )
 
 func msg(direccion string){
-	fmt.Printf("%s\n"," 10.6.40.173/24:"+direccion)
-	conn, err := grpc.Dial(" 10.6.40.173/24:"+direccion, grpc.WithInsecure())
+	fmt.Printf("%s\n"," 10.6.40.173:"+direccion)
+	conn, err := grpc.Dial(" 10.6.40.173:"+direccion, grpc.WithInsecure())
 
 	if err != nil {
 		panic("No se puede conectar al servidor "+ err.Error())
