@@ -108,7 +108,6 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 	serviceClient1 := pb.NewEntradaMensajeClient(conn1)
 	
 	var res string
-	fmt.Println("Se recibió el siguiente mensaje: "+ req.Body)
 	//Mientras espera mensaje jugador debe escribir "<N jugador> Listo?"
 	if strings.Contains(req.Body, "Listo?"){
 		if (flagListo == 1) && (PendingRequest(req.Body) == 0) {
