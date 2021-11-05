@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"strconv"
 	"strings"
+	"time"
 
 	pb "github.com/MaxGGx/Distribuidos-2021-2/M1/Test3/proto"
 	"google.golang.org/grpc"
@@ -25,6 +27,7 @@ func Jugada(limit int) int {
 	rand.Seed(time.Now().UnixNano())
 	n := rand.Intn(limit) + 1
 	return n
+}
 
 func Opciones(serviceClient pb.EntradaMensajeClient) {
 	var jugada int
@@ -119,7 +122,7 @@ func IA(Jugador int, Channel chan int) {
 			if !Vivo {
 				//fmt.Println("Has perdido, estas muerto")
 				Channel <- 1
-				return 
+				return
 			}
 			ronda++
 		}
@@ -134,7 +137,7 @@ func IA(Jugador int, Channel chan int) {
 				if res == "MUERTO" {
 					//fmt.Println("Has sido eliminado")
 					Channel <- 1
-					return 
+					return
 				}
 			}
 		}
@@ -198,7 +201,7 @@ func IA(Jugador int, Channel chan int) {
 	}
 }
 
-func Jugador(Channel chan int){
+func Jugador(Channel chan int) {
 
 	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
 
@@ -207,25 +210,8 @@ func Jugador(Channel chan int){
 	}
 	serviceClient := pb.NewEntradaMensajeClient(conn)
 
-	var unirse int
 	autorizado := true // Autorizacion de parte del lider
 	flag := false
-
-	fmt.Println("Desea unirse al Juego?")
-	fmt.Println("1. Si")
-	fmt.Println("2. No")
-
-	for flag {
-		fmt.Scanln(&unirse)
-		if unirse == 1 {
-			fmt.Println("Enviar solicitud de unirse")
-			flag = false
-		} else if unirse == 2 {
-			return 1
-		} else {
-			flag = true
-		}
-	}
 
 	Solicitud(serviceClient, "16 Sol1")
 	flag = true
@@ -383,17 +369,17 @@ func Jugador(Channel chan int){
 	}
 }
 
-func main (){
+func main() {
 	nJugadores := 15
 	Channel := make(chan int, nJugadores)
-	
+
 	for i := 0; i < nJugadores; i++ {
 		go IA(i, Channel)
 	}
 
 	go Jugador(Channel)
 
-	count := 1 
+	count := 1
 	for count < nJugadores+1 {
 		<-Channel
 		count++
