@@ -54,7 +54,7 @@ func Opciones(serviceClient pb.EntradaMensajeClient) {
 }
 
 func IA(Jugador int, Channel chan int) {
-	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+	conn, err := grpc.Dial("dist33:50051", grpc.WithInsecure())
 
 	if err != nil {
 		panic("No se puede conectar al servidor " + err.Error())
@@ -228,7 +228,7 @@ func IA(Jugador int, Channel chan int) {
 }
 func Jugador(Channel chan int) {
 
-	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+	conn, err := grpc.Dial("dist33:50051", grpc.WithInsecure())
 
 	if err != nil {
 		panic("No se puede conectar al servidor " + err.Error())
