@@ -1,3 +1,7 @@
+build:
+	go build -o binaryM1 "Lider/server/main.go"
+
 run:
-	cd Lider/server
-	go run main.go
+	go run 
+
+build_and_run: build run
