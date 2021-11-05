@@ -1,10 +1,10 @@
-module github.com/MaxGGx/Distribuidos-2021-2/M1/Test3
+module github.com/MaxGGx/Distribuidos-2021-2/blob/seba/M4/Jugador.go
 
 go 1.17
 
 require (
-	google.golang.org/grpc v1.41.0
-	google.golang.org/protobuf v1.27.1
+	github.com/MaxGGx/Distribuidos-2021-2/M1/Test3 v0.0.0-20211030160604-7bea45895b23
+	google.golang.org/grpc v1.42.0
 )
 
 require (
@@ -13,4 +13,5 @@ require (
 	golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd // indirect
 	golang.org/x/text v0.3.0 // indirect
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
+	google.golang.org/protobuf v1.27.1 // indirect
 )

@@ -1,6 +1,6 @@
 # Distribuidos-2021-2
 
-Repo de tareas de distribuidos
+Jugadores
 
 Nombres: <br>
 Luis Gonzalez <br>
