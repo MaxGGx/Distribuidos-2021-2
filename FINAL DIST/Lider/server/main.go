@@ -55,7 +55,7 @@ func vivos(lista [17]int){
 	fmt.Println("Jugadores vivos:")
 	for i,v := range lista{
 		if v == 1{
-			fmt.Println("Jugador "+i)
+			fmt.Println("Jugador "+strconv.Itoa(i))
 		}
 	}
 }
