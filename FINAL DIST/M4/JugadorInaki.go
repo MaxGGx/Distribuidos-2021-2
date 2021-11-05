@@ -415,7 +415,7 @@ func Jugador(Channel chan int) {
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	nJugadores := 16
+	nJugadores := 15
 	Channel := make(chan int, nJugadores)
 
 	for i := 1; i <= nJugadores; i++ {
