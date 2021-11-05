@@ -20,11 +20,11 @@ type server struct {
 
 //MODIFICAR AQUI LOS VALORES DE LAS MAQUINAS
 //IP M1
-var ipDataNode1 = "localhost:50053"
+var ipDataNode1 = "dist33:50053"
 //IP M2
-var ipDataNode2 = "localhost:50054"
-//IP M3
-var ipDataNode3 = "localhost:50055"
+var ipDataNode2 = "dist34:50054"
+//IP M4
+var ipDataNode3 = "dist36:50055"
 
 //Creacion de archivo data
 var (
@@ -38,19 +38,22 @@ var (
 func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaje, error) {
 	fmt.Println("NameNode recibió el siguiente mensaje: "+ req.Body)
 	var res1 string
-	conn1, err1 := grpc.Dial(ipDataNode1, grpc.WithInsecure())
+	//conn1, err1 := grpc.Dial(ipDataNode1, grpc.WithInsecure())
+	conn1, err1 := grpc.Dial("dist33:50053", grpc.WithInsecure())
 	if err1 != nil {
 		panic("No se puede conectar al Data Node 1 "+ err.Error())
 	}
 	serviceClient1 := pb.NewEntradaMensajeClient(conn1)
 	
-	conn2, err2 := grpc.Dial(ipDataNode2, grpc.WithInsecure())
+	//conn2, err2 := grpc.Dial(ipDataNode2, grpc.WithInsecure())
+	conn2, err2 := grpc.Dial("dist34:50054", grpc.WithInsecure())
 	if err2 != nil {
 		panic("No se puede conectar al Data Node 2 "+ err.Error())
 	}
 	serviceClient2 := pb.NewEntradaMensajeClient(conn2)
 
-	conn3, err3 := grpc.Dial(ipDataNode3, grpc.WithInsecure())
+	//conn3, err3 := grpc.Dial(ipDataNode3, grpc.WithInsecure())
+	conn3, err3 := grpc.Dial("dist36:50055", grpc.WithInsecure())
 	if err3 != nil {
 		panic("No se puede conectar al Data Node 3 "+ err.Error())
 	}
