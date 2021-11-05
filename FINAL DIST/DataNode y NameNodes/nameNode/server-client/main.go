@@ -61,7 +61,7 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 	request := strings.Split(string(req.Body),",")
 	fmt.Println(request)
 	if len(request) == 3 {
-		file, err := os.Open("data/data.txt")
+		file, err := os.Open("../data/data.txt")
 		if err != nil{
 			log.Fatal(err)
 		}
@@ -108,7 +108,7 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 			res1 = "No se tiene data del jugador en la "+request[2]
 		} 
 	} else {
-		file, err := os.Open("data/data.txt")
+		file, err := os.Open("../data/data.txt")
 		if err != nil{
 			log.Fatal(err)
 		}
@@ -165,7 +165,7 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 					panic("Mensaje no pudo ser creado ni enviado: "+ err.Error())
 				}
 				res1 = res.Body
-				f, err := os.OpenFile("data/data.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+				f, err := os.OpenFile("../data/data.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 				if err != nil {
     				panic(err)
 				}
@@ -184,7 +184,7 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 					panic("Mensaje no pudo ser creado ni enviado: "+ err.Error())
 				}
 				res1 = res.Body
-				f, err := os.OpenFile("data/data.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+				f, err := os.OpenFile("../data/data.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 				if err != nil {
     				panic(err)
 				}
@@ -204,7 +204,7 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 					panic("Mensaje no pudo ser creado ni enviado: "+ err.Error())
 				}
 				res1 = res.Body
-				f, err := os.OpenFile("data/data.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+				f, err := os.OpenFile("../data/data.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 				if err != nil {
     				panic(err)
 				}
