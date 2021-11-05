@@ -88,7 +88,7 @@ func main() {
 	
 	go func(){
 		fmt.Println("ANDANDO")
-		listener, err := net.Listen("tcp", ":50060")
+		listener, err := net.Listen("tcp", ":50056")
 
 		if err != nil {
 			panic("No se puede crear la conexión tcp: "+ err.Error())
