@@ -1,2 +1,0 @@
-Jugador_J1 Ronda_3 100000000
-Jugador_J1 Ronda_3 200000000
