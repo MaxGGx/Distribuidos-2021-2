@@ -90,7 +90,7 @@ func IA(Jugador int, Channel chan int) {
 			if Total <= 21 {
 				//fmt.Printf("----------Ronda %d----------\n\n", ronda)
 				//fmt.Println("Ingrese su numero entre 1 y 10")
-				jugada = Jugada(7)
+				jugada = Jugada(10)
 				Solicitud(serviceClient, strconv.Itoa(Jugador)+" "+strconv.Itoa(jugada))
 			} else {
 				Solicitud(serviceClient, strconv.Itoa(Jugador)+" nul")
