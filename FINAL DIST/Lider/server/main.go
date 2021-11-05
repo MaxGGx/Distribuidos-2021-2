@@ -280,9 +280,11 @@ func main() {
 				fmt.Println(err)
 				panic(err)
 			}
-		} else {
+		}else if (resR1 < ronda1valor) && (tamanio2(status) > 1){
 			juego1sumas[i] = resR1
 			respuestas[i] = "VIVO 1 1"
+		}else{
+			respuestas[i] = "VIVO 1 GANADOR"
 		}
 	}
 	VaciarSolicitudes()
