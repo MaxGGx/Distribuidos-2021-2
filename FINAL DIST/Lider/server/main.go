@@ -23,8 +23,9 @@ var flagListo = 0
 var solicitudes [17]string
 var respuestas [17]string
 var status = [17]int {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-//var conn1 *grpc.ClientConn
+var FIN = 0
 var equipo1 []int
+var equipo2 []int
 var Nequipo1 = 0
 var Nequipo2 = 0
 
@@ -50,7 +51,14 @@ func tamanio2(lista [17]int) (cont int) {
 	return
 }
 
-
+func vivos(lista [17]int){
+	fmt.Println("Jugadores vivos:")
+	for i,v := range lista{
+		if v == 1{
+			fmt.Println("Jugador "+i)
+		}
+	}
+}
 
 //Limpia el array de solicitudes para no generar conflictos en la recepcion.
 func VaciarSolicitudes(){
@@ -71,8 +79,8 @@ func Recepcion(mensaje string) (resmje string){
 	temp := strings.Split(mensaje, " ")
 	valor, _ := strconv.Atoi(temp[0])
 	solicitudes[valor] = temp[1]
-	fmt.Println("Mensajes de jugadores recibidos:")
-	fmt.Println(solicitudes)
+	//fmt.Println("Mensajes de jugadores recibidos:")
+	//fmt.Println(solicitudes)
 	if tamanio(solicitudes) == tamanio2(status){
 		flagListo = 0
 	}
@@ -110,7 +118,7 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 	//fmt.Println("Se recibió el siguiente mensaje: "+ req.Body)
 	//Mientras espera mensaje jugador debe escribir "<N jugador> Listo?"
 	if strings.Contains(req.Body, "Listo?"){
-		if (flagListo == 1) && (PendingRequest(req.Body) == 0) {
+		if ((flagListo == 1) && (PendingRequest(req.Body) == 0)) || (FIN == 1) {
 			res = Delivery(req.Body)
 		}else {
 			res = "[*] Processing..."
@@ -129,8 +137,6 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 	 	res1, err := serviceClient1.Intercambio(context.Background(), &pb.Mensaje{
 			Body: solicitud,
 		})
-		fmt.Println("ALSDJASLDJKASLDASKDLKASL UWU")
-		fmt.Println(res1.Body)
 		if err != nil {
 			panic("Mensaje no pudo ser creado ni enviado: "+ err.Error())
 		}
@@ -197,7 +203,7 @@ func main() {
 
 
 	//CONEXION A NAME NODE IP: M3:
-	conn3, err := grpc.Dial("dist35:50052", grpc.WithInsecure())
+	conn3, err := grpc.Dial("localhost:50052", grpc.WithInsecure())
 	if err != nil {
 		panic("No se puede conectar al servidor "+ err.Error())
 	}
@@ -232,7 +238,7 @@ func main() {
 	ronda1valor := (rand.Intn(4)+6)
 	fmt.Println("[*] Numero elegido por el líder: "+strconv.Itoa(ronda1valor))
 	fmt.Println("[*] Esperando respuestas de Ronda 1 - Juego 1...")
-	fmt.Println(status)
+	vivos(status)
 
 	for tamanio(solicitudes) < 16{
 	}
@@ -289,7 +295,7 @@ func main() {
 		ronda2valor := (rand.Intn(4)+6)
 		fmt.Println("[*] Numero elegido por el líder: "+strconv.Itoa(ronda2valor))
 		fmt.Println("[*] Esperando respuestas Ronda 2 Juego 1...")
-		fmt.Println(status)
+		vivos(status)
 		for tamanio(solicitudes) < tamanio2(status){
 			
 		}
@@ -347,7 +353,7 @@ func main() {
 		ronda3valor := (rand.Intn(4)+6)
 		fmt.Println("[*] Numero elegido por el líder: "+strconv.Itoa(ronda3valor))
 		fmt.Println("[*] Esperando respuestas Ronda 3 Juego 1...")
-		fmt.Println(status)
+		vivos(status)
 		for tamanio(solicitudes) < tamanio2(status){
 			
 		}
@@ -405,7 +411,7 @@ func main() {
 		ronda4valor := (rand.Intn(4)+6)
 		fmt.Println("[*] Numero elegido por el líder: "+strconv.Itoa(ronda4valor))
 		fmt.Println("[*] Esperando respuestas Ronda 4 Juego 1...")
-		fmt.Println(status)
+		vivos(status)
 		for tamanio(solicitudes) < tamanio2(status){
 			
 		}
@@ -450,7 +456,28 @@ func main() {
 							}
 					} else {
 						juego1sumas[i] += resR4
+						if juego1sumas[i] < 21{
+							respuestas[i] = "MUERTO FIN 1"
+							fmt.Println("Jugador "+strconv.Itoa(i)+" Ha MUERTO")
+							status[i] = 0
+							err = ch.Publish(
+							"",
+							"TestQueue",
+							false,
+							false,
+							amqp.Publishing{
+								ContentType: "text/plain",
+								Body: []byte("J"+stringjugador+" DEAD 1"),
+							},
+							)
+
+							if err != nil {
+								fmt.Println(err)
+								panic(err)
+							}
+						} else{
 						respuestas[i] = "VIVO FIN 1"
+					}
 					}
 				}else{
 					respuestas[i] = "VIVO FIN 1"
@@ -463,12 +490,24 @@ func main() {
 	if (tamanio2(status) > 1 ){
 		//PREPARACION JUEGO 2:
 		fmt.Println("[*] Preparando todo para Juego 2...")
-		fmt.Println(status)
+		vivos(status)
 		for tamanio(solicitudes) < tamanio2(status){
 			
 		}
 		flagListo = 0
 		VaciarRespuestas()
+		flagsito:=0
+		for flagsito == 0{
+			contadorcito := 0
+			for _,i := range solicitudes{
+				if i != "Sol2"{
+					contadorcito++
+				}
+			}
+			if contadorcito == tamanio2(status){
+				flagsito = 1
+			}
+		}
 		if tamanio2(status)%2 != 0{
 			actual := tamanio2(status)
 			rand.Seed(time.Now().UnixNano())
@@ -476,6 +515,7 @@ func main() {
 			for tamanio2(status) == actual{
 				if status[amatar] == 1{
 					status[amatar] = 0
+					respuestas[amatar] = "MUERTO FIN 1"
 					fmt.Println("Jugador "+strconv.Itoa(amatar)+" Ha MUERTO")
 					err = ch.Publish(
 					"",
@@ -497,15 +537,15 @@ func main() {
 				}
 			}
 		}
-		for i:=1; i<17; i++{
-			if status[i] == 1{
-				respuestas[i] = "VIVO FIN 1"
-			} else {
-				respuestas[i] = "MUERTO FIN 1"
-			}
-		}
+		//for i:=1; i<17; i++{
+		//	if status[i] == 1{
+		//		respuestas[i] = "VIVO FIN 1"
+		//	} else {
+		//		respuestas[i] = "MUERTO FIN 1"
+		//	}
+		//}
 		//Armado de equipos:
-		//var equipo1 []int
+		
 		//var Nequipo1 = 0
 		//var Nequipo2 = 0
 		aequipo := (rand.Intn(15)+1)
@@ -517,19 +557,28 @@ func main() {
 				aequipo = (rand.Intn(15)+1)
 			}
 		}
-		VaciarSolicitudes()
-		flagListo = 1
+		aequipo = (rand.Intn(15)+1)
+		for len(equipo2) != (tamanio2(status)/2){
+			if (status[aequipo] == 1){
+				equipo2 = append(equipo2,aequipo)
+				aequipo = (rand.Intn(15)+1)
+			}else{
+				aequipo = (rand.Intn(15)+1)
+			}
+		}
+		//VaciarSolicitudes()
+		//flagListo = 1
 		for tamanio(solicitudes) < tamanio2(status){
 			
-		}
+		} 
 	}
 	if (tamanio2(status) > 1 ){
 		// ###############################################################################
 		//JUEGO 2 
 		// ###############################################################################
 		
-		flagListo = 0
-		VaciarRespuestas()
+		//flagListo = 0
+		//VaciarRespuestas()
 		//SE ASUME QUE A ESTE PUNTO SE RECIBEN TODAS LAS SOLICITUDES.
 		//PROCESAMIENTO JUEGO 2:
 		PromptLider = -1
@@ -552,7 +601,7 @@ func main() {
 			}
 		}
 		fmt.Println("[*] Esperando respuestas Juego 2...")
-		fmt.Println(status)
+		
 		NJuego2 := (rand.Intn(15)+1)
 		for i:=1; i<17; i++{
 			banderita := 0
@@ -607,7 +656,7 @@ func main() {
 								}
 						}
 					}
-					if respuestas[i] != "MUERTO"{
+					if respuestas[i] != "MUERTO FIN 1"{
 						respuestas[i] = "VIVO FIN 1"
 					}
 				} 
@@ -618,7 +667,40 @@ func main() {
 							respuestas[i] = "VIVO FIN 1"
 						}
 					}
-					if respuestas[i] != "VIVO"{
+					for _,b := range equipo2{
+						if i == b{
+						respuestas[i] = "MUERTO FIN 1"
+						status[i] = 0
+						fmt.Println("Jugador "+strconv.Itoa(i)+" ha MUERTO")
+						err = ch.Publish(
+							"",
+							"TestQueue",
+							false,
+							false,
+							amqp.Publishing{
+								ContentType: "text/plain",
+								Body: []byte("J"+strconv.Itoa(i)+" DEAD 2"),
+							},
+							)
+
+							if err != nil {
+								fmt.Println(err)
+								panic(err)
+							}
+						}
+					}
+				} 
+			}
+		}else if (Nequipo1%2 == NJuego2%2){
+			flagmatanza = 1
+			for i,_ := range status{
+				for _,b := range equipo1{
+					if i == b{
+						respuestas[i] = "VIVO FIN 1"
+					}
+				}
+				for _,b := range equipo2{
+					if i == b{
 						respuestas[i] = "MUERTO FIN 1"
 						status[i] = 0
 						fmt.Println("Jugador "+strconv.Itoa(i)+" ha MUERTO")
@@ -638,38 +720,11 @@ func main() {
 								panic(err)
 							}
 					}
-				} 
-			}
-		}else if (Nequipo1%2 == NJuego2%2){
-			flagmatanza = 1
-			for i,_ := range status{
-				for _,b := range equipo1{
-					if i == b{
-						respuestas[i] = "VIVO FIN 1"
-					}
-				}
-				if respuestas[i] != "VIVO"{
-					respuestas[i] = "MUERTO FIN 1"
-					status[i] = 0
-					fmt.Println("Jugador "+strconv.Itoa(i)+" ha MUERTO")
-					err = ch.Publish(
-						"",
-						"TestQueue",
-						false,
-						false,
-						amqp.Publishing{
-							ContentType: "text/plain",
-							Body: []byte("J"+strconv.Itoa(i)+" DEAD 2"),
-						},
-						)
-
-						if err != nil {
-							fmt.Println(err)
-							panic(err)
-						}
 				}
 			}
-		}else{
+		}else if (Nequipo1%2 == Nequipo2%2) && (Nequipo1%2 == NJuego2%2) {
+			flagmatanza = 0
+		} else {
 			flagmatanza = 1
 			for i,_ := range status{
 				for _,b := range equipo1{
@@ -694,7 +749,7 @@ func main() {
 						}
 					}
 				}
-				if respuestas[i] != "MUERTO"{
+				if respuestas[i] != "MUERTO FIN 1"{
 					respuestas[i] = "VIVO FIN 1"
 				}
 			}
@@ -704,8 +759,30 @@ func main() {
 				respuestas[i] = "VIVO FIN 1"
 			}
 		}
+		for i:=1 ; i<17; i++{
+			if status[i] == 1{
+				respuestas[i] = "VIVO FIN 1"
+			}
+		}
 		VaciarSolicitudes()
 		flagListo = 1
+		for tamanio(solicitudes) < tamanio2(status){
+			
+		}
+		flagListo = 0
+		VaciarRespuestas()
+		flagsito:=0
+		for flagsito == 0{
+			contadorcito := 0
+			for _,i := range solicitudes{
+				if (i != "Sol3") && (i != "") && (i != "Sol2") && (i != "Sol1"){
+					contadorcito++
+				}
+			}
+			if contadorcito == tamanio2(status){
+				flagsito = 1
+			}
+		}
 	}
 	if (tamanio2(status) > 1 ){
 		// ###############################################################################
@@ -718,6 +795,7 @@ func main() {
 			for tamanio2(status) == actual{
 				if status[amatar] == 1{
 					status[amatar] = 0
+					respuestas[amatar] = "MUERTO FIN 1"
 					fmt.Println("Jugador "+strconv.Itoa(amatar)+" ha MUERTO")
 					err = ch.Publish(
 						"",
@@ -739,13 +817,13 @@ func main() {
 				}
 			}
 		}
-		for i:=1; i<17; i++{
-			if status[i] == 1{
-				respuestas[i] = "VIVO FIN 1"
-			} else {
-				respuestas[i] = "MUERTO FIN 1"
-			}
-		}
+		//for i:=1; i<17; i++{
+		//	if status[i] == 1{
+		//		respuestas[i] = "VIVO FIN 1"
+		//	} else {
+		//		respuestas[i] = "MUERTO FIN 1"
+		//	}
+		//}
 		//Armado de equipos:
 		var equipos [][]int
 		var tempequi []int
@@ -758,19 +836,20 @@ func main() {
 				}
 			}
 		}
-		VaciarSolicitudes()
-		flagListo = 1
-		for tamanio(solicitudes) < tamanio2(status){
-			
-		}
-		flagListo = 0
-		VaciarRespuestas()
+		//VaciarSolicitudes()
+		//flagListo = 1
+		//for tamanio(solicitudes) < tamanio2(status){
+		//	
+		//}
+		//flagListo = 0
+		//VaciarRespuestas()
 		PromptLider = -1
 		for PromptLider != 0{
 			fmt.Println("Todo listo para el Juego 3! RONDA FINAL")
 			fmt.Println("Seleccione una opción para continuar escribiendo un número:\n")
 			fmt.Println("0) Dar inicio al juego 3 de Squid Game <コ:彡")
 			fmt.Println("Ingrese un numero del 1 al 16 para consultar el historial de un jugador")
+			fmt.Println(status)
 			fmt.Scanln(&PromptLider)
 			if PromptLider != 0{
 				res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
@@ -793,7 +872,7 @@ func main() {
 			}
 		}
 		fmt.Println("[*] Esperando respuestas Juego 3...")
-		fmt.Println(status)
+		vivos(status)
 		NJuego3 := (rand.Intn(9)+1)
 		for _,v := range equipos{
 			jugador1 := v[0] 
@@ -865,22 +944,28 @@ func main() {
 		flagListo = 1
 	}
 	fmt.Println("ESPERANDO RESPUESTAS PARA IMPRIMIR FINAL")
-	for tamanio(solicitudes) < tamanio2(status){
-			
-	}
-	flagListo = 0
-	VaciarRespuestas()
-	fmt.Println("Squid Game TERMINADO")
-	fmt.Println("GANADORES:")
-	for i,v := range status{
-		if v == 1{
-			fmt.Println("Jugador "+strconv.Itoa(i))
-			respuestas[i] = "VIVO FIN GANADOR"
-		} else {
-			respuestas[i] = "MUERTO FIN 1"
+	fmt.Println(status)
+	if tamanio2(status) != 0{
+		for tamanio(solicitudes) < tamanio2(status){
+				
 		}
+		flagListo = 0
+		VaciarRespuestas()
+		fmt.Println("Squid Game TERMINADO")
+		fmt.Println("GANADORES:")
+		for i,v := range status{
+			if v == 1{
+				fmt.Println("Jugador "+strconv.Itoa(i))
+				respuestas[i] = "VIVO FIN GANADOR"
+			} else {
+				respuestas[i] = "MUERTO FIN 1"
+			}
+		}
+		flagListo = 1
+		FIN = 1
+	} else {
+		fmt.Println("SIN GANADOR: Murieron todos los jugadores :c")
 	}
-	flagListo = 1
 	fmt.Println("Antes de finalizar, puede hacer lo siguiente:")
 	PromptLider = -1
 	for PromptLider != 0{
