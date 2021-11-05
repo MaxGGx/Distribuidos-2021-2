@@ -502,7 +502,7 @@ func main() {
 		for flagsito == 0{
 			contadorcito := 0
 			for _,i := range solicitudes{
-				if i != "Sol2"{
+				if (i != "Sol3") && (i != "") && (i != "Sol2") && (i != "Sol1"){
 					contadorcito++
 				}
 			}
