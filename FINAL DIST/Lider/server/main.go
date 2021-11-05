@@ -458,7 +458,7 @@ func main() {
 							}
 					} else {
 						juego1sumas[i] += resR4
-						if juego1sumas[i] < 21{
+						if juego1sumas[i] < 15{
 							respuestas[i] = "MUERTO FIN 1"
 							fmt.Println("Jugador "+strconv.Itoa(i)+" Ha MUERTO")
 							status[i] = 0
