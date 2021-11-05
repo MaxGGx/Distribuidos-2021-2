@@ -1,3 +1,3 @@
 run:
-	cd "Lider/server"
+	cd Lider/server
 	go run main.go
