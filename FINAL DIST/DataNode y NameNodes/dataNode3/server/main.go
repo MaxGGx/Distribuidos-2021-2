@@ -24,8 +24,8 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 	request := strings.Split(string(req.Body),",")
 	fmt.Println(request)
 	if request[0] == "ARCHIVO"{
-		if _,err := os.Stat("data/"+request[1]); err == nil {
-			file, err := os.Open("data/"+request[1])
+		if _,err := os.Stat("../data/"+request[1]); err == nil {
+			file, err := os.Open("../data/"+request[1])
 
 			if err != nil{
 				log.Fatalf("Fallo en abrir archivo")
@@ -43,7 +43,7 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 			res = "Jugador no tiene datos en DataNode"
 		}
 	} else {
-		f, err := os.OpenFile("data/"+request[1], os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+		f, err := os.OpenFile("../data/"+request[1], os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 		if err != nil {
     		panic(err)
 		}
