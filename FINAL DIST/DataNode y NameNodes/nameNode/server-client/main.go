@@ -64,7 +64,7 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 	request := strings.Split(string(req.Body),",")
 	fmt.Println(request)
 	if len(request) == 3 {
-		file, err := os.Create("../data/data.txt")
+		file, err := os.Open("../data/data.txt")
 		if err != nil{
 			log.Fatal(err)
 		}
@@ -111,7 +111,7 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 			res1 = "No se tiene data del jugador en la "+request[2]
 		} 
 	} else {
-		file, err := os.Create("../data/data.txt")
+		file, err := os.Open("../data/data.txt")
 		if err != nil{
 			log.Fatal(err)
 		}
@@ -225,7 +225,7 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 
 func main() {
 	/*
-	newFile, err = os.Create("data/data.txt")
+	newFile, err = os.Open("data/data.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
