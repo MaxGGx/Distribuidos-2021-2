@@ -18,4 +18,4 @@ Se mencionará las instrucciones a realizar por cada máquina inicialmente, y de
 
 Para la máquina dist33:
 	Instancia 1:
-		Una vez conectada a alumno@dist33, se ejecuta el código "cd tarea/Distri"
+		Una vez conectada a alumno@dist33, se ejecuta el comando $ cd "tarea/Distribuidos-2021-2/FINAL DIST/Lider/server"
