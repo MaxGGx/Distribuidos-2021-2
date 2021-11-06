@@ -110,11 +110,21 @@ Para la máquina dist36:
 
 Orden de ejecución (como iniciar las máquinas virtuales):
 
+Para ejecutar las diferentes instancias desde la 1 hasta la 7, se sugiere ubicarse en el directorio correspondiente (ejemplo de la máquina Instancia 1: ubicarse en .../server); una vez ubicadas las 7 instancias en su directorio, ejecutar el comando "make run" en las instancias en el siguiente orden:
 
+primero los 3 data nodes, luego el name node, luego el pozo, luego el lider, por último el jugador; es decir:
+
+Instancia 2, Instancia 4, Instancia 7, Instancia 5, Instancia 3, Instancia 1, Instancia 6.
+
+Una vez iniciadas todas las instancias, en la instancia del lider se dará la opción de controlar el juego, y en la instancia del jugador se pueden realizar las jugadas.
 
 
 
 Consideraciones:
+-Todas las máquinas virtuales cuentan con un readme llamado README.md que se encuentra en el directorio "Distribuidos-2021-2"
+
+-Si se ve que una de las consolas se queda detenida (sea lider o el jugador), revisar la otra (jugador o lider) por si falta algún input.
+
 - Se asume que los archivos de ronda se identifican como las etapas
 
 - Se asume que las entradas siempre serán correctas
@@ -124,3 +134,5 @@ Consideraciones:
 - Se toma en cuenta que el jugador una vez que gana deberá pasar por las demás etapas de igual forma sin tomar en cuenta sus valores para llegar a obtener el mensaje de ganador.
 
 - Tomar en consideración que debido al azar que manejan los BOTS, estos la mayoría de las veces no podrán pasar mas allá de la ronda 1, se recomienda para ello si se quiere analizar mas allá de dicha etapa, modificar la condición en la línea 461 del archivo de líder (Líder/server/main.go) para que no mate a la mayoría de los BOTS que no lograron sumar los 21. Esto podria ser por ejemplo que los BOTS no sumen 21 sino que 10 o menos para hacer pasar a gran parte de ellos a la siguiente etapa.
+
+-Se toma en cuenta que existen prints para el lider los cuales indican las acciones realizadas. Una de ellas es cuando se registra en name node exitosamente la movida o jugada del usuario ("Agregado Exitosamente"). Ademas de ello cuando se consulta sobre el historial de un jugador, la mostrara en la forma de historial de ronda/etapa 1 a 3, en donde si no exite data sobre dicha ronda, se avisará por pantalla del lider. Finalmente, las demás interfaces de NameNode, DataNode y Pozo, mostraán un mensaje de la forma en que sea mas facil identificar el traspaso de mensajes que se realiza.
