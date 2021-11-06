@@ -121,6 +121,8 @@ Una vez iniciadas todas las instancias, en la instancia del lider se dará la op
 
 
 Consideraciones:
+-El archivo .zip descargado de github no permite elegir una sola rama para descargar, por lo que se sugiere revisar al abrir el .zip, que se esté en la rama adecuada "inaki"
+
 -Todas las máquinas virtuales cuentan con un readme llamado README.md que se encuentra en el directorio "Distribuidos-2021-2"
 
 -Si se ve que una de las consolas se queda detenida (sea lider o el jugador), revisar la otra (jugador o lider) por si falta algún input.
