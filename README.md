@@ -25,13 +25,23 @@ Para la máquina dist33:
 
 	Instancia 1:
 
-		Una vez conectada a alumno@dist33, se ejecuta el comando $ cd "tarea/Distribuidos-2021-2/FINAL DIST/Lider/server"
+		Una vez conectada a alumno@dist33, primero se tiene que cambiar al directorio donde se encuentra el repositorio Git, con el comando $ cd "tarea/Distribuidos-2021-2"
+
+		El segundo paso es asegurarse de trabajar en la rama "inaki", por lo que se ejecuta el commando $ git checkout inaki
+
+		Luego, se ejecuta el comando $ cd "FINAL DIST/Lider/server"
 
 		una vez en el directorio .../server, se ejecuta el comando $ make run
 
 	Instancia 2:
 
-		Una vez conectada a alumno@dist33, se ejecuta el comando $ cd "tarea/Distribuidos-2021-2/FINAL DIST/DataNode y NameNodes/dataNode1/server"
+		Una vez conectada a alumno@dist33, primero se tiene que cambiar al directorio donde se encuentra el repositorio Git, con el comando $ cd "tarea/Distribuidos-2021-2"
+
+		El segundo paso es asegurarse de trabajar en la rama "inaki", por lo que se ejecuta el commando $ git checkout inaki
+
+		Luego, se ejecuta el comando $ cd "FINAL DIST/DataNode y NameNodes/dataNode1/server"
 
 		una vez en el directorio .../server, se ejecuta el comando $ make run
+
+
 
