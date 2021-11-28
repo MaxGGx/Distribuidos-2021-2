@@ -1,0 +1,5 @@
+go mod init github.com/MaxGGx/Distribuidos-2021-2/M1/Test3/proto
+go mod create github.com/MaxGGx/Distribuidos-2021-2/M1/Test3/proto
+
+Compilar protoc
+protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/mensaje.proto
