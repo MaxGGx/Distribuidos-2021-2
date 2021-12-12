@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package grpc;
+
+option go_package = "github.com/MaxGGx/Distribuidos-2021-2/tree/main/M1/Test3/proto";
+
+message Mensaje {
+	string body = 1;
+}
+
+service EntradaMensaje {
+	rpc Intercambio(Mensaje) returns (Mensaje);
+}
