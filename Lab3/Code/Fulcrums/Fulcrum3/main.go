@@ -44,9 +44,9 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 		ans = LeiaProcess(req.Body)
 	} else if (strings.Split(req.Body, " ")[0] == "CLK"){
 		ans = getCLK(req.Body) 
-	} else if (strings.Split(req.Body, " ")[0] == "MERGEU"){
+	} else if (strings.Split(req.Body, ",")[0] == "MERGEU"){
 		ans = processMergeu(req.Body)
-	} else if (strings.Split(req.Body, " ")[0] == "MERGECLK"){
+	} else if (strings.Split(req.Body, ",")[0] == "MERGECLK"){
 		ans = processMergeclk(req.Body)
 	} else {
 		ans = processInformante(req.Body)
@@ -524,8 +524,9 @@ func timer(){
 
 
 func main(){
+	go timer()
 	//Solo inicializo server, Funciones se encargan del resto 
-	listener, err := net.Listen("tcp", ":50054")
+	listener, err := net.Listen("tcp", ":50004")
 
 	if err != nil {
 		panic("No se puede crear la conexión tcp: "+ err.Error())
@@ -536,6 +537,6 @@ func main(){
 	if err = serv.Serve(listener); err != nil {
 		panic("No se ha podido inicializar el servidor: "+ err.Error())
 	}
-	//go timer()
+	
 
 }

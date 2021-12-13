@@ -41,14 +41,19 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 	ans := ""
 	fmt.Println("Broker recibió el siguiente mensaje: "+ req.Body)
 	if(strings.Split(req.Body, " ")[0] == "GetNumberRebelds"){
+		fmt.Println("Entree 1")
 		ans = LeiaProcess(req.Body)
 	} else if (strings.Split(req.Body, " ")[0] == "CLK"){
+		fmt.Println("Entree 2")
 		ans = getCLK(req.Body) 
-	} else if (strings.Split(req.Body, " ")[0] == "MERGEU"){
+	} else if (strings.Split(req.Body, ",")[0] == "MERGEU"){
+		fmt.Println("Entree 3")
 		ans = processMergeu(req.Body)
-	} else if (strings.Split(req.Body, " ")[0] == "MERGECLK"){
+	} else if (strings.Split(req.Body, ",")[0] == "MERGECLK"){
+		fmt.Println("Entree 4")
 		ans = processMergeclk(req.Body)
 	} else {
+		fmt.Println("Entree 5")
 		ans = processInformante(req.Body)
 	}
 	return &pb.Mensaje{Body: ans}, nil 
@@ -271,6 +276,8 @@ func processMergeclk(comando string)(respuesta string){
 func processMergeu(comando string)(respuesta string){
 	planeta := strings.Split(comando, ",")[1]
 	linea := strings.Split(comando, ",")[2]
+	fmt.Println("Planeta: "+planeta)
+	fmt.Println(strings.Split(comando, ","))
 	if _,err := os.Stat("planetas/"+planeta+".txt"); err == nil {
 		file, err := os.Open("planetas/"+planeta+".txt")
     	if err!=nil{
@@ -524,8 +531,9 @@ func timer(){
 
 
 func main(){
+	go timer()
 	//Solo inicializo server, Funciones se encargan del resto 
-	listener, err := net.Listen("tcp", ":50053")
+	listener, err := net.Listen("tcp", ":50003")
 
 	if err != nil {
 		panic("No se puede crear la conexión tcp: "+ err.Error())
@@ -536,6 +544,6 @@ func main(){
 	if err = serv.Serve(listener); err != nil {
 		panic("No se ha podido inicializar el servidor: "+ err.Error())
 	}
-	//go timer()
+	
 
 }

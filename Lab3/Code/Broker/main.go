@@ -220,6 +220,7 @@ func getInfo(command string)(respuesta string){
 }
 
 func main() {
+	//fmt.Println(enviarMsg(ipFulcrum1, "Hola"))
 	//Solo inicializo server, Funciones se encargan del resto 
 	listener, err := net.Listen("tcp", ":50051")
 
