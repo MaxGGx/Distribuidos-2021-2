@@ -44,7 +44,7 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 		ans = LeiaProcess(req.Body)
 	} else if (strings.Split(req.Body, " ")[0] == "CLK"){
 		ans = getCLK(req.Body) 
-	} else if (strings.Split(req.Body, ",")[0] == "MERGEU"){
+	} else if ((strings.Split(req.Body, ",")[0] == "MERGEU") || (strings.Split(req.Body, ",")[0] == "MERGEUA")){
 		ans = processMergeu(req.Body)
 	} else if (strings.Split(req.Body, ",")[0] == "MERGECLK"){
 		ans = processMergeclk(req.Body)
@@ -107,7 +107,7 @@ func processInformante(comando string)(respuesta string){
 		//En ambos casos, debe crearse/actualizarse el reloj del archivo para el planeta.
 		for i:= range clkPlanets{
 			if (clkPlanets[i].planeta == cP[1]){
-				clkPlanets[i].relojx++
+				clkPlanets[i].relojz++
 				relojx := strconv.Itoa(clkPlanets[i].relojx)
 				relojy := strconv.Itoa(clkPlanets[i].relojy)
 				relojz := strconv.Itoa(clkPlanets[i].relojz)
@@ -119,6 +119,7 @@ func processInformante(comando string)(respuesta string){
 		respuesta = "1 0 0"
 		return
 	}else if (tipoC == "UpdateName"){
+		//UpdateName Planeta Nombre1 Nombre2
 		cP := strings.Split(comando, " ")
 		//Se procede con cambiar la linea
     	input,err := ioutil.ReadFile("planetas/"+cP[1]+".txt")
@@ -130,7 +131,8 @@ func processInformante(comando string)(respuesta string){
     	for i, line := range lines {
     		if strings.Contains(line, cP[1]+" "+cP[2]){
     			linea := strings.Split(lines[i], " ")
-    			lines[i] = cP[1]+" "+cP[2]+" "+linea[2]
+    			//fmt.Println("Lo encontre, escribiré: "+cP[1]+" "+cP[2]+" "+linea[2])
+    			lines[i] = cP[1]+" "+cP[3]+" "+linea[2]
     		}
     	}
     	output := strings.Join(lines,"\n")
@@ -150,7 +152,7 @@ func processInformante(comando string)(respuesta string){
     	}
     	for i:= range clkPlanets{
 			if (clkPlanets[i].planeta == cP[1]){
-				clkPlanets[i].relojx++
+				clkPlanets[i].relojz++
 				relojx := strconv.Itoa(clkPlanets[i].relojx)
 				relojy := strconv.Itoa(clkPlanets[i].relojy)
 				relojz := strconv.Itoa(clkPlanets[i].relojz)
@@ -189,7 +191,7 @@ func processInformante(comando string)(respuesta string){
     	}
     	for i:= range clkPlanets{
 			if (clkPlanets[i].planeta == cP[1]){
-				clkPlanets[i].relojx++
+				clkPlanets[i].relojz++
 				relojx := strconv.Itoa(clkPlanets[i].relojx)
 				relojy := strconv.Itoa(clkPlanets[i].relojy)
 				relojz := strconv.Itoa(clkPlanets[i].relojz)
@@ -230,7 +232,7 @@ func processInformante(comando string)(respuesta string){
     	}
     	for i:= range clkPlanets{
 			if (clkPlanets[i].planeta == cP[1]){
-				clkPlanets[i].relojx++
+				clkPlanets[i].relojz++
 				relojx := strconv.Itoa(clkPlanets[i].relojx)
 				relojy := strconv.Itoa(clkPlanets[i].relojy)
 				relojz := strconv.Itoa(clkPlanets[i].relojz)
@@ -269,6 +271,43 @@ func processMergeclk(comando string)(respuesta string){
 
 //Procesa el MERGEU (para cuando se desea pasar las lineas del archivo).
 func processMergeu(comando string)(respuesta string){
+	planeta := strings.Split(comando, ",")[1]
+	if(strings.Split(comando,",")[0] == "MERGEU"){
+		//Orden de borrado y reset del planeta
+		path:="planetas/"+strings.Split(comando,",")[1]+".txt"
+    	f,err1:=os.Create(path)
+    	if err1 != nil {
+    		log.Fatal(err1)
+    	}
+    	defer f.Close()
+    	f.Close()
+	} else {
+		linea := strings.Split(comando, ",")[2]
+		//Si no esta dentro del archivo, se agrega y si no existe, se crea agregando la linea.
+    	f, err := os.OpenFile("planetas/"+planeta+".txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+    	if err!= nil {
+    		panic(err)
+    	}
+    	defer f.Close()
+    	if _,err = f.WriteString(linea+"\n"); err != nil {
+    		panic(err)
+    	}
+    	flag:=0
+    	for i := range clkPlanets{
+    		if(clkPlanets[i].planeta == planeta){
+    			flag=1
+    		}
+    	}
+    	if(flag==0){
+    		//Se crea ademas el clock para que luego sea actualizado
+    		clkPlanets = append(clkPlanets,clock{planeta, 1, 0, 0})
+    	}
+    	
+	}
+	respuesta = "manejado"
+	return
+}
+/*
 	planeta := strings.Split(comando, ",")[1]
 	linea := strings.Split(comando, ",")[2]
 	if _,err := os.Stat("planetas/"+planeta+".txt"); err == nil {
@@ -337,7 +376,7 @@ func processMergeu(comando string)(respuesta string){
 	respuesta = "Manejado"
 	return
 }
-
+*/
 
 //Obtiene el reloj del archivo de un planeta, si no existe, se retorna un Err404
 func getCLK(comando string)(clock string){
@@ -373,7 +412,7 @@ func getCity(planeta string, ciudad string)(data string){
     			break;
     		}
     	}
-    	if (flag==0){
+    	if (flag==1){
     		data = "Error: Ciudad no existe, verifique y vuelva a reintentar"
     	}
     	file.Close()
@@ -467,6 +506,15 @@ func timer(){
     		} else if ((res2 != res1) && (res2 != "Err404") && (res1 != "Err404")){
     			//Son distintos, por lo que yo estoy desactualizado, no se hace nada, asumiendo que otro fulcrum esta mas actualizado.
     		}
+    		path:="log_planetas/"
+    		err1:=os.RemoveAll(path)
+    		if err1 != nil {
+    			log.Fatal(err1)
+    		}
+    		err1 = os.Mkdir("log_planetas", 0700)
+    		if err1 != nil {
+    			log.Fatal(err1)
+    		}    		
     	}
     	for i:= range toSend2{
     		//MERGEU,<planeta>,<linea a cambiar>
@@ -478,8 +526,9 @@ func timer(){
     			}
     			scanner := bufio.NewScanner(file)
     			scanner.Split(bufio.ScanLines)
+    			enviarMsg(ipFulcrum2, "MERGEU,"+toSend2[i])
     			for scanner.Scan() {
-    				_ = enviarMsg(ipFulcrum2, "MERGEU,"+toSend2[i]+","+scanner.Text())
+    				_ = enviarMsg(ipFulcrum2, "MERGEUA,"+toSend2[i]+","+scanner.Text())
     			}
     			file.Close()
     		}
@@ -501,8 +550,9 @@ func timer(){
     			}
     			scanner := bufio.NewScanner(file)
     			scanner.Split(bufio.ScanLines)
+    			enviarMsg(ipFulcrum1, "MERGEU,"+toSend1[i])
     			for scanner.Scan() {
-    				_ = enviarMsg(ipFulcrum1, "MERGEU,"+toSend1[i]+","+scanner.Text())
+    				_ = enviarMsg(ipFulcrum1, "MERGEUA,"+toSend1[i]+","+scanner.Text())
     			}
     			file.Close()
     		}

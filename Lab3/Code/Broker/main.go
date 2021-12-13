@@ -27,7 +27,7 @@ func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaj
 	if(strings.Split(req.Body, " ")[0] == "GetNumberRebelds"){
 		ans = getInfo(req.Body)
 	} else {
-		ans = obtainIP(req.Body)
+		ans = obtainIP(strings.Split(req.Body, " ")[1])
 	}
 	return &pb.Mensaje{Body: ans}, nil 
 }

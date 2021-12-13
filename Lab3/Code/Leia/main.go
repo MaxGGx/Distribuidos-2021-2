@@ -72,20 +72,19 @@ func processMsg(command string){
 	var comando = strings.Split(command, " ")
 	
 	//Se recibe la ip para el fulcrum
+	fmt.Println("[*] Consultando Broker...\n")
 	respuesta := enviarMsg(direccionBroker, command)
-	fmt.Println("[*] Ip recibida desde el Broker:\n")
-	fmt.Println(respuesta)
-	direccionFulcrum = respuesta
+	fmt.Println("[*] Respuesta recibida desde el Broker:")
+	if (strings.Split(respuesta, " ")[2] == "no"){
+		fmt.Println(respuesta)
+	} else {
+		fmt.Println(strings.Split(respuesta," ")[2]+" Reloj: "+strings.Split(respuesta," ")[3])
+	}
 
-	//Se consulta al Fulcrum
-	fmt.Println("[*] Ejecutando consulta al servidor fulcrum...")
-	respuesta = enviarMsg(respuesta, command)
-	fmt.Println("[*] Respuesta recibida!, datos:\n")
-	fmt.Println(respuesta)
-	
 	//Se analiza si no hay error
-	data := strings.Split(respuesta, " ")
+	data := strings.Split(strings.Split(respuesta, " ")[3],",")
 	if(len(data)==3){
+		fmt.Println("PASE")
 		//Se recibieron los valores del reloj, se verifica consistencia y se actualiza data en struct del planeta.
 		dataX,_ := strconv.Atoi(data[0])
 		dataY,_ := strconv.Atoi(data[1])
@@ -111,6 +110,7 @@ func processMsg(command string){
 		if(flag == 1){
 			//Quiere decir que no se maneja info del planeta y el archivo fue creado.
 			planetas = append(planetas, Cplaneta(comando[1], dataX, dataY, dataZ, direccionFulcrum))
+			fmt.Println("\n[*] Sin Error de consistencia! \n")
 		}
 	} else {
 		//Error, no se hace nada
@@ -130,39 +130,6 @@ func scanMsg()(mensaje string){
 }
 
 func main() {
-	/*
-	===== Pruebas para la creacion de un planeta =====
-	e := Cplaneta("TESTTTT")
-	e.relojx++
-	fmt.Println("Nombre del planeta: "+e.nombre)
-	fmt.Println("Int en X: ")
-	fmt.Println(e.relojx)
-	fmt.Println(e.relojy)
-	fmt.Println(e.relojz)
-	*/
-	
-	/*
-	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
-
-	if err != nil {
-		panic("No se puede conectar al servidor "+ err.Error())
-	}
-
-	serviceClient := pb.NewEntradaMensajeClient(conn)
-	*/
-	
-	/* 
-	======Para enviar un mje======		
-	res, err := serviceClient.Intercambio(context.Background(), &pb.Mensaje{
-	Body: valor+" 2",
-	})
-	
-	if err != nil {
-		panic("Mensaje no pudo ser creado ni enviado: "+ err.Error())
-	}
-	
-	fmt.Println(res.Body)
-	*/
 	mensaje:="-1"
 	for(mensaje != "0"){
 		mensaje:=scanMsg()

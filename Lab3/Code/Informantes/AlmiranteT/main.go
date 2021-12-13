@@ -99,6 +99,7 @@ func processMsg(command string){
 					planetas[i].relojz = dataZ
 					planetas[i].lastfulcrum = direccionFulcrum
 					flag = 0
+					fmt.Println("\n[*] Sin Error de consistencia! \n")
 					break 
 				} else {
 					fmt.Println("[*] Error de consistencia!")
@@ -107,7 +108,7 @@ func processMsg(command string){
 				}
 			}
 		}
-		if(flag == 0){
+		if(flag == 1){
 			//Quiere decir que no se maneja info del planeta y el archivo fue creado.
 			planetas = append(planetas, Cplaneta(comando[1], dataX, dataY, dataZ, direccionFulcrum))
 		}
