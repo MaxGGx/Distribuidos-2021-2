@@ -41,7 +41,7 @@ Para la máquina dist34:
 
 	Instancia 2:
 
-		Una vez conectada a alumno@dist34, primero se tiene que cambiar al directorio donde se encuentra el repositorio Git, con el comando $ cd "tarea/Distribuidos-2021-2"
+		Una vez conectada a alumno@dist34, primero se tiene que cambiar al directorio donde se encuentra el repositorio Git, con el comando $ cd "Distribuidos-2021-2"
 
 		El segundo paso es asegurarse de trabajar en la rama "inaki", por lo que se ejecuta el commando $ git checkout inaki
 
