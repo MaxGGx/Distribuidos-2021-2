@@ -485,6 +485,7 @@ func timer(){
     	var toSend3 []string
     	var planetas []string
     	for i:= range planets {
+    		fmt.Println(strings.Split(planets[i],"\\"))
     		planetas = append(planetas, strings.Split(strings.Split(planets[i],"\\")[1],".")[0])
     	}
     	for i:= range planetas{
