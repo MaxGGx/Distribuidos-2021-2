@@ -121,124 +121,147 @@ func processInformante(comando string)(respuesta string){
 	}else if (tipoC == "UpdateName"){
 		cP := strings.Split(comando, " ")
 		//Se procede con cambiar la linea
-    	input,err := ioutil.ReadFile("planetas/"+cP[1]+".txt")
-    	if err != nil {
-    		log.Fatalln(err)
-    	}
-    	lines := strings.Split(string(input), "\n")
+		if _, err := os.Stat("planetas/"+cP[1]+".txt"); err == nil {
+	    	input,err := ioutil.ReadFile("planetas/"+cP[1]+".txt")
+	    	if err != nil {
+	    		respuesta = "Error 404: No existe"
+	    		return
+	    		//log.Fatalln(err)
+	    	}
+	    	lines := strings.Split(string(input), "\n")
+	    	flag:=1
+	    	for i, line := range lines {
+	    		if strings.Contains(line, cP[1]+" "+cP[2]){
+	    			flag = 0
+	    			linea := strings.Split(lines[i], " ")
+	    			//fmt.Println("Lo encontre, escribiré: "+cP[1]+" "+cP[2]+" "+linea[2])
+	    			lines[i] = cP[1]+" "+cP[3]+" "+linea[2]
+	    		}
+	    	}
+	    	output := strings.Join(lines,"\n")
+	    	err = ioutil.WriteFile("planetas/"+cP[1]+".txt", []byte(output), 0644)
+	    	if err != nil {
+	    		log.Fatalln(err)
+	    	}
+	    	//Se actualiza Log
+	    	f, err := os.OpenFile("log_planetas/"+cP[1]+".log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	    	if err!= nil {
+	    		panic(err)
+	    	}
+	    	defer f.Close()
 
-    	for i, line := range lines {
-    		if strings.Contains(line, cP[1]+" "+cP[2]){
-    			linea := strings.Split(lines[i], " ")
-    			//fmt.Println("Lo encontre, escribiré: "+cP[1]+" "+cP[2]+" "+linea[2])
-    			lines[i] = cP[1]+" "+cP[3]+" "+linea[2]
-    		}
-    	}
-    	output := strings.Join(lines,"\n")
-    	err = ioutil.WriteFile("planetas/"+cP[1]+".txt", []byte(output), 0644)
-    	if err != nil {
-    		log.Fatalln(err)
-    	}
-    	//Se actualiza Log
-    	f, err := os.OpenFile("log_planetas/"+cP[1]+".log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
-    	if err!= nil {
-    		panic(err)
-    	}
-    	defer f.Close()
-
-    	if _,err = f.WriteString(strings.Join(cP," ")+"\n"); err != nil {
-    		panic(err)
-    	}
-    	for i:= range clkPlanets{
-			if (clkPlanets[i].planeta == cP[1]){
-				clkPlanets[i].relojy++
-				relojx := strconv.Itoa(clkPlanets[i].relojx)
-				relojy := strconv.Itoa(clkPlanets[i].relojy)
-				relojz := strconv.Itoa(clkPlanets[i].relojz)
-				respuesta = relojx+" "+relojy+" "+relojz
+	    	if _,err = f.WriteString(strings.Join(cP," ")+"\n"); err != nil {
+	    		panic(err)
+	    	}
+	    	for i:= range clkPlanets{
+				if ((clkPlanets[i].planeta == cP[1]) && (flag == 0)){
+					clkPlanets[i].relojy++
+					relojx := strconv.Itoa(clkPlanets[i].relojx)
+					relojy := strconv.Itoa(clkPlanets[i].relojy)
+					relojz := strconv.Itoa(clkPlanets[i].relojz)
+					respuesta = relojx+" "+relojy+" "+relojz
+				}
 			}
+			return
+		} else {
+			respuesta = "Error 404: No existe planeta"
+	    	return
 		}
-		return
 	}else if (tipoC == "UpdateNumber"){
 		cP := strings.Split(comando, " ")
 		//Se procede con cambiar la linea
-    	input,err := ioutil.ReadFile("planetas/"+cP[1]+".txt")
-    	if err != nil {
-    		log.Fatalln(err)
-    	}
-    	lines := strings.Split(string(input), "\n")
+		if _, err := os.Stat("planetas/"+cP[1]+".txt"); err == nil {
+	    	input,err := ioutil.ReadFile("planetas/"+cP[1]+".txt")
+	    	if err != nil {
+	    		respuesta = "Error 404: No existe"
+	    		return
+	    		//log.Fatalln(err)
+	    	}
+	    	lines := strings.Split(string(input), "\n")
+	    	flag:=1
+	    	for i, line := range lines {
+	    		if strings.Contains(line, cP[1]+" "+cP[2]){
+	    			lines[i] = cP[1]+" "+cP[2]+" "+cP[3]
+	    			flag = 0
+	    		}
+	    	}
+	    	output := strings.Join(lines,"\n")
+	    	err = ioutil.WriteFile("planetas/"+cP[1]+".txt", []byte(output), 0644)
+	    	if err != nil {
+	    		log.Fatalln(err)
+	    	}
+	    	//Se actualiza Log
+	    	f, err := os.OpenFile("log_planetas/"+cP[1]+".log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	    	if err!= nil {
+	    		panic(err)
+	    	}
+	    	defer f.Close()
 
-    	for i, line := range lines {
-    		if strings.Contains(line, cP[1]+" "+cP[2]){
-    			lines[i] = cP[1]+" "+cP[2]+" "+cP[3]
-    		}
-    	}
-    	output := strings.Join(lines,"\n")
-    	err = ioutil.WriteFile("planetas/"+cP[1]+".txt", []byte(output), 0644)
-    	if err != nil {
-    		log.Fatalln(err)
-    	}
-    	//Se actualiza Log
-    	f, err := os.OpenFile("log_planetas/"+cP[1]+".log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
-    	if err!= nil {
-    		panic(err)
-    	}
-    	defer f.Close()
-
-    	if _,err = f.WriteString(strings.Join(cP," ")+"\n"); err != nil {
-    		panic(err)
-    	}
-    	for i:= range clkPlanets{
-			if (clkPlanets[i].planeta == cP[1]){
-				clkPlanets[i].relojy++
-				relojx := strconv.Itoa(clkPlanets[i].relojx)
-				relojy := strconv.Itoa(clkPlanets[i].relojy)
-				relojz := strconv.Itoa(clkPlanets[i].relojz)
-				respuesta = relojx+" "+relojy+" "+relojz
+	    	if _,err = f.WriteString(strings.Join(cP," ")+"\n"); err != nil {
+	    		panic(err)
+	    	}
+	    	for i:= range clkPlanets{
+				if ((clkPlanets[i].planeta == cP[1]) && (flag==0)){
+					clkPlanets[i].relojy++
+					relojx := strconv.Itoa(clkPlanets[i].relojx)
+					relojy := strconv.Itoa(clkPlanets[i].relojy)
+					relojz := strconv.Itoa(clkPlanets[i].relojz)
+					respuesta = relojx+" "+relojy+" "+relojz
+				}
 			}
+			return
+		} else {
+			respuesta = "Error 404: No existe planeta"
+	    	return
 		}
-		return
+
 	}else{
 		cP := strings.Split(comando, " ")
 		//Se procede con eliminar la linea
-    	input,err := ioutil.ReadFile("planetas/"+cP[1]+".txt")
-    	if err != nil {
-    		log.Fatalln(err)
-    	}
-    	lines := strings.Split(string(input), "\n")
+    	if _, err := os.Stat("planetas/"+cP[1]+".txt"); err == nil {
+	    	input,err := ioutil.ReadFile("planetas/"+cP[1]+".txt")
+	    	if err != nil {
+	    		log.Fatalln(err)
+	    	}
+	    	lines := strings.Split(string(input), "\n")
+	    	flag := 1
+	    	for i, line := range lines {
+	    		if strings.Contains(line, cP[1]+" "+cP[2]){
+	    			lines[i] = lines[len(lines)-1]
+	    			lines[len(lines)-1] = ""
+	    			lines = lines[:len(lines)-1]
+	    			flag=0
+	    		}
+	    	}
+	    	output := strings.Join(lines,"\n")
+	    	err = ioutil.WriteFile("planetas/"+cP[1]+".txt", []byte(output), 0644)
+	    	if err != nil {
+	    		log.Fatalln(err)
+	    	}
+	    	//Se actualiza Log
+	    	f, err := os.OpenFile("log_planetas/"+cP[1]+".log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	    	if err!= nil {
+	    		panic(err)
+	    	}
+	    	defer f.Close()
 
-    	for i, line := range lines {
-    		if strings.Contains(line, cP[1]+" "+cP[2]){
-    			lines[i] = lines[len(lines)-1]
-    			lines[len(lines)-1] = ""
-    			lines = lines[:len(lines)-1]
-    		}
-    	}
-    	output := strings.Join(lines,"\n")
-    	err = ioutil.WriteFile("planetas/"+cP[1]+".txt", []byte(output), 0644)
-    	if err != nil {
-    		log.Fatalln(err)
-    	}
-    	//Se actualiza Log
-    	f, err := os.OpenFile("log_planetas/"+cP[1]+".log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
-    	if err!= nil {
-    		panic(err)
-    	}
-    	defer f.Close()
-
-    	if _,err = f.WriteString(strings.Join(cP," ")+"\n"); err != nil {
-    		panic(err)
-    	}
-    	for i:= range clkPlanets{
-			if (clkPlanets[i].planeta == cP[1]){
-				clkPlanets[i].relojy++
-				relojx := strconv.Itoa(clkPlanets[i].relojx)
-				relojy := strconv.Itoa(clkPlanets[i].relojy)
-				relojz := strconv.Itoa(clkPlanets[i].relojz)
-				respuesta = relojx+" "+relojy+" "+relojz
+	    	if _,err = f.WriteString(strings.Join(cP," ")+"\n"); err != nil {
+	    		panic(err)
+	    	}
+	    	for i:= range clkPlanets{
+				if ((clkPlanets[i].planeta == cP[1])&&(flag==0)){
+					clkPlanets[i].relojy++
+					relojx := strconv.Itoa(clkPlanets[i].relojx)
+					relojy := strconv.Itoa(clkPlanets[i].relojy)
+					relojz := strconv.Itoa(clkPlanets[i].relojz)
+					respuesta = relojx+" "+relojy+" "+relojz
+				}
 			}
+			return
+		} else {
+			respuesta = "Error 404: No existe planeta"
+	    	return
 		}
-		return
 	}
 	return
 }

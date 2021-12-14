@@ -84,7 +84,7 @@ func processMsg(command string){
 	//Se analiza si no hay error
 	data := strings.Split(strings.Split(respuesta, " ")[3],",")
 	if(len(data)==3){
-		fmt.Println("PASE")
+		//fmt.Println("PASE")
 		//Se recibieron los valores del reloj, se verifica consistencia y se actualiza data en struct del planeta.
 		dataX,_ := strconv.Atoi(data[0])
 		dataY,_ := strconv.Atoi(data[1])
