@@ -75,7 +75,7 @@ func processMsg(command string){
 	fmt.Println("[*] Consultando Broker...\n")
 	respuesta := enviarMsg(direccionBroker, command)
 	fmt.Println("[*] Respuesta recibida desde el Broker:")
-	if (strings.Split(respuesta, " ")[2] == "no"){
+	if (strings.Split(respuesta, " ")[0] == "Error:"){
 		fmt.Println(respuesta)
 	} else {
 		fmt.Println(strings.Split(respuesta," ")[2]+" Reloj: "+strings.Split(respuesta," ")[3])
