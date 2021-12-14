@@ -39,7 +39,7 @@ type server struct {
 
 func (s *server ) Intercambio (ctx context.Context, req *pb.Mensaje) (*pb.Mensaje, error) {
 	ans := ""
-	fmt.Println("Broker recibió el siguiente mensaje: "+ req.Body)
+	fmt.Println("Fulcrum 2 recibió el siguiente mensaje: "+ req.Body)
 	if(strings.Split(req.Body, " ")[0] == "GetNumberRebelds"){
 		ans = LeiaProcess(req.Body)
 	} else if (strings.Split(req.Body, " ")[0] == "CLK"){
