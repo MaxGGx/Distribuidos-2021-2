@@ -18,9 +18,9 @@ import (
 )
 
 //Variables constantes
-var ipFulcrum1 = "localhost:50002"
-var ipFulcrum2 = "localhost:50003"
-var ipFulcrum3 = "localhost:50004"
+var ipFulcrum1 = "dist34:50002"
+var ipFulcrum2 = "dist35:50003"
+var ipFulcrum3 = "dist36:50004"
 
 //Struct para guardar los relojes por planeta
 type clock struct{

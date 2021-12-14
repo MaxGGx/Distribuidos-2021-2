@@ -22,7 +22,7 @@ type planeta struct {
 
 //Lista de structs que almacenará de manera eficiente los planetas.
 var planetas []planeta
-var direccionBroker = "localhost:50051"
+var direccionBroker = "dist33:50051"
 var direccionFulcrum= ""
 
 //Constructor para el planeta, cosa de poder almacenar en memoria la info de los planetas manejados por la consola del informante.
